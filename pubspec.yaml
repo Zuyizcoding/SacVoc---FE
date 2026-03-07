@@ -1,0 +1,56 @@
+name: sac_voc
+description: "Sắc Vóc — Personal Color & Body Analysis App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # --- State Management (Bizz84 Clean Architecture) ---
+  flutter_riverpod: ^2.5.1       # AsyncNotifier + Provider
+  riverpod_annotation: ^2.3.5    # Code generation annotations
+
+  # --- Networking ---
+  dio: ^5.4.0                    # HTTP client (interceptors, retry)
+
+  # --- Device Info (device_id cho API) ---
+  device_info_plus: ^10.1.0      # Lấy unique device identifier
+
+  # --- Navigation ---
+  go_router: ^14.2.0             # Declarative routing
+
+  # --- Storage ---
+  shared_preferences: ^2.2.0     # Key-value local storage
+
+  # --- Image ---
+  image_picker: ^1.0.7           # Camera + Gallery picker
+  cached_network_image: ^3.3.1   # Cache ảnh outfit từ URL
+
+  # --- Utilities ---
+  url_launcher: ^6.2.5           # Mở link Shopee trong trình duyệt
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  riverpod_generator: ^2.4.3
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
