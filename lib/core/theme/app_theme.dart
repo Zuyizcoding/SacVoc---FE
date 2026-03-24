@@ -105,7 +105,7 @@ class AppTheme {
     ),
 
     // Card — Glassmorphism-ready
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardSurface,
       elevation: 0,                         // Dùng boxShadow thay vì elevation
       shape: RoundedRectangleBorder(
