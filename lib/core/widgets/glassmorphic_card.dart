@@ -11,6 +11,7 @@
 ///   )
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class GlassmorphicCard extends StatelessWidget {
   final Widget child;
@@ -25,33 +26,26 @@ class GlassmorphicCard extends StatelessWidget {
     this.blur = 10.0,
     this.opacity = 0.15,
     this.padding,
-    this.borderRadius = 16.0,
+    this.borderRadius = AppTheme.radiusMedium,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
+        horizontal: AppTheme.spacing16,
+        vertical: AppTheme.spacing8,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-            spreadRadius: 0,
-          ),
-        ],
+        boxShadow: AppTheme.cardShadow,  // Bóng đổ mềm
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
           child: Container(
-            padding: padding ?? const EdgeInsets.all(24),
+            padding: padding ?? const EdgeInsets.all(AppTheme.spacing24),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(opacity),
               borderRadius: BorderRadius.circular(borderRadius),

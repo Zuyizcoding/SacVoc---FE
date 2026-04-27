@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/outfit_repository.dart';
@@ -16,6 +17,7 @@ class OutfitScreen extends ConsumerStatefulWidget {
 
 class _OutfitScreenState extends ConsumerState<OutfitScreen> {
   bool _isDialogShowing = false;
+  bool _hasTriggeredHaptic = false;
 
   @override
   void initState() {
@@ -67,6 +69,16 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
       final error = next.error;
       if (error is MissingAnalysisException) {
         _showMissingAnalysisDialog();
+      }
+
+      final hasData = next.asData?.value != null;
+      if (hasData && !_hasTriggeredHaptic) {
+        HapticFeedback.lightImpact();
+        _hasTriggeredHaptic = true;
+      }
+
+      if (next.isLoading) {
+        _hasTriggeredHaptic = false;
       }
     });
 

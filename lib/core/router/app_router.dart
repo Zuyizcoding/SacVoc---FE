@@ -10,22 +10,130 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomeScreen(),
+      pageBuilder: (context, state) => _buildTransitionPage(
+        state: state,
+        child: const SplashScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/home',
+      pageBuilder: (context, state) => _buildTransitionPage(
+        state: state,
+        child: const HomeScreen(),
+      ),
     ),
     GoRoute(
       path: '/color',
-      builder: (context, state) => const ColorAnalysisScreen(),
+      pageBuilder: (context, state) => _buildTransitionPage(
+        state: state,
+        child: const ColorAnalysisScreen(),
+      ),
     ),
     GoRoute(
       path: '/body',
-      builder: (context, state) => const BodyAnalysisScreen(),
+      pageBuilder: (context, state) => _buildTransitionPage(
+        state: state,
+        child: const BodyAnalysisScreen(),
+      ),
     ),
     GoRoute(
       path: '/outfit',
-      builder: (context, state) => const OutfitScreen(),
+      pageBuilder: (context, state) => _buildTransitionPage(
+        state: state,
+        child: const OutfitScreen(),
+      ),
     ),
   ],
 );
+
+CustomTransitionPage<void> _buildTransitionPage({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final fade = CurvedAnimation(parent: animation, curve: Curves.easeOut);
+      final slide = Tween<Offset>(
+        begin: const Offset(0, 0.08),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+
+      return FadeTransition(
+        opacity: fade,
+        child: SlideTransition(
+          position: slide,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..forward();
+
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _scaleAnimation = Tween<double>(begin: 0.92, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      context.go('/home');
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: const Text(
+                'Sắc Vóc',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -34,26 +142,28 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sắc Vóc')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-              onPressed: () => context.push('/color'),
-              child: const Text('Phân tích màu sắc'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.push('/body'),
-              child: const Text('Phân tích dáng người'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.push('/outfit'),
-              child: const Text('Gợi ý trang phục'),
-            ),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ElevatedButton(
+                onPressed: () => context.push('/color'),
+                child: const Text('Phân tích màu sắc'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.push('/body'),
+                child: const Text('Phân tích dáng người'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.push('/outfit'),
+                child: const Text('Gợi ý trang phục'),
+              ),
+            ],
+          ),
         ),
       ),
     );
