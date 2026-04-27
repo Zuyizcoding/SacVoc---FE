@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
+import 'core/router/app_router.dart';
 
 void main() {
   runApp(
@@ -13,13 +14,11 @@ class SacVocApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Sắc Vóc',
       theme: AppTheme.light,
       debugShowCheckedModeBanner: false,
-      home: const Scaffold(
-        body: Center(child: Text('Sắc Vóc — Phase 1 OK ✓')),
-      ),
+      routerConfig: appRouter,
     );
   }
 }
