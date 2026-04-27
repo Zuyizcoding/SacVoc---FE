@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/analysis/presentation/body_analysis_screen.dart';
 import '../../features/analysis/presentation/color_analysis_screen.dart';
+import '../../features/outfit/presentation/outfit_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -21,7 +22,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/outfit',
-      builder: (context, state) => const OutfitPlaceholderScreen(),
+      builder: (context, state) => const OutfitScreen(),
     ),
   ],
 );
@@ -49,24 +50,11 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: null,
-              child: const Text('Gợi ý trang phục (Phase 5)'),
+              onPressed: () => context.push('/outfit'),
+              child: const Text('Gợi ý trang phục'),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class OutfitPlaceholderScreen extends StatelessWidget {
-  const OutfitPlaceholderScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Tính năng outfit sẽ bật ở Phase 5.'),
       ),
     );
   }
