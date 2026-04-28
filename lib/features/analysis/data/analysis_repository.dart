@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/api_constants.dart';
 import '../../../core/network/dio_client.dart';
+import '../domain/analysis_history_result.dart';
 import '../domain/color_result.dart';
 import '../domain/body_result.dart';
 
@@ -23,6 +24,9 @@ abstract class AnalysisRepository {
 
   /// F2 — Phân tích dáng người từ ảnh toàn thân
   Future<BodyResult> analyzeBody(File imageFile);
+
+  /// Lịch sử F1 + F2 — màn "Xem lại kết quả"
+  Future<AnalysisHistoryResult> getHistory();
 }
 
 // ──────────────────────────────────────────────
@@ -83,6 +87,24 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
       }
 
       throw Exception(json['error'] ?? 'Phân tích thất bại');
+    } on DioException catch (e) {
+      throw _mapDioError(e);
+    }
+  }
+
+  @override
+  Future<AnalysisHistoryResult> getHistory() async {
+    try {
+      final response = await _dio.get(ApiConstants.analyzeHistory);
+      final json = response.data as Map<String, dynamic>;
+
+      if (json['success'] == true && json['data'] != null) {
+        return AnalysisHistoryResult.fromJson(
+          json['data'] as Map<String, dynamic>,
+        );
+      }
+
+      return const AnalysisHistoryResult(color: null, body: null);
     } on DioException catch (e) {
       throw _mapDioError(e);
     }

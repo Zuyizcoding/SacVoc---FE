@@ -10,6 +10,7 @@ class ApiConstants {
   /// Endpoints
   static const String analyzeColor = '/api/v1/analyze/color';
   static const String analyzeBody = '/api/v1/analyze/body';
+  static const String analyzeHistory = '/api/v1/analyze/history';
   static const String outfitRecommend = '/api/v1/outfits/recommend';
   static const String health = '/health';
 }

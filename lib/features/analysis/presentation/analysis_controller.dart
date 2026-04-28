@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/analysis_repository.dart';
+import '../domain/analysis_history_result.dart';
 import '../domain/color_result.dart';
 import '../domain/body_result.dart';
 
@@ -81,5 +82,32 @@ class BodyAnalysisController extends AsyncNotifier<BodyResult?> {
 
   void reset() {
     state = const AsyncValue.data(null);
+  }
+}
+
+// ──────────────────────────────────────────────
+// History Viewer Controller (F1 + F2)
+// ──────────────────────────────────────────────
+
+/// State cho History Viewer — AsyncValue tự xử lý Loading/Data/Error
+final analysisHistoryProvider =
+    AsyncNotifierProvider<AnalysisHistoryController, AnalysisHistoryResult?>(
+  AnalysisHistoryController.new,
+);
+
+class AnalysisHistoryController extends AsyncNotifier<AnalysisHistoryResult?> {
+  @override
+  Future<AnalysisHistoryResult?> build() async {
+    final repository = ref.read(analysisRepositoryProvider);
+    return repository.getHistory();
+  }
+
+  /// Refresh lịch sử — gọi lại API
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(analysisRepositoryProvider);
+      return repository.getHistory();
+    });
   }
 }

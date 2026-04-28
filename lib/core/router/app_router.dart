@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/analysis/presentation/body_analysis_screen.dart';
 import '../../features/analysis/presentation/color_analysis_screen.dart';
+import '../../features/analysis/presentation/history_screen.dart';
 import '../../features/outfit/presentation/outfit_detail_screen.dart';
 import '../../features/outfit/presentation/outfit_screen.dart';
 
@@ -35,6 +36,13 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _buildTransitionPage(
         state: state,
         child: const BodyAnalysisScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/history',
+      pageBuilder: (context, state) => _buildTransitionPage(
+        state: state,
+        child: const HistoryScreen(),
       ),
     ),
     GoRoute(
@@ -178,6 +186,11 @@ class HomeScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => context.push('/outfit'),
                 child: const Text('Gợi ý trang phục'),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => context.push('/history'),
+                child: const Text('Xem lại kết quả'),
               ),
             ],
           ),
