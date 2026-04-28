@@ -16,8 +16,8 @@ import '../../../core/network/dio_client.dart';
 
 /// Repository provider — inject DioClient
 final outfitRepositoryProvider = Provider<OutfitRepository>((ref) {
-  final client = ref.watch(dioClientProvider);
-  return OutfitRepositoryImpl(client);
+  final dio = ref.watch(dioProvider);
+  return OutfitRepositoryImpl(dio);
 });
 
 /// Controller provider — quản lý state F3 recommendations

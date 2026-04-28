@@ -5,7 +5,6 @@
 ///   - mobile-flutter #3: Repository Pattern — data layer tách biệt
 ///   - Tính năng #15: F1+F2→F3 flow — xử lý lỗi "chưa phân tích"
 import 'package:dio/dio.dart';
-import '../../../core/network/dio_client.dart';
 import '../../../core/network/api_response.dart';
 import '../domain/outfit_result.dart';
 
@@ -22,27 +21,30 @@ abstract class OutfitRepository {
 
 /// Implementation gọi API thật
 class OutfitRepositoryImpl implements OutfitRepository {
-  final DioClient _client;
+  final Dio _dio;
 
-  OutfitRepositoryImpl(this._client);
+  OutfitRepositoryImpl(this._dio);
 
   @override
   Future<OutfitResult> getRecommendations({
     String occasion = 'daily',
   }) async {
     try {
-      final response = await _client.dio.get(
+      final response = await _dio.get(
         '/api/v1/outfits/recommend',
         queryParameters: {'occasion': occasion},
       );
 
-      final apiResponse = ApiResponse.fromJson(response.data);
+      final apiResponse = ApiResponse.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => OutfitResult.fromJson(json),
+      );
 
       if (!apiResponse.success || apiResponse.data == null) {
         throw Exception(apiResponse.error ?? 'Lỗi không xác định');
       }
 
-      return OutfitResult.fromJson(apiResponse.data!);
+      return apiResponse.data!;
     } on DioException catch (e) {
       throw _mapDioError(e);
     }
@@ -51,17 +53,20 @@ class OutfitRepositoryImpl implements OutfitRepository {
   @override
   Future<OutfitDetail> getOutfitDetail(int outfitId) async {
     try {
-      final response = await _client.dio.get(
+      final response = await _dio.get(
         '/api/v1/outfits/$outfitId',
       );
 
-      final apiResponse = ApiResponse.fromJson(response.data);
+      final apiResponse = ApiResponse.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => OutfitDetail.fromJson(json),
+      );
 
       if (!apiResponse.success || apiResponse.data == null) {
         throw Exception(apiResponse.error ?? 'Không tìm thấy outfit');
       }
 
-      return OutfitDetail.fromJson(apiResponse.data!);
+      return apiResponse.data!;
     } on DioException catch (e) {
       throw _mapDioError(e);
     }

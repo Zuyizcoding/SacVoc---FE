@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/analysis/presentation/body_analysis_screen.dart';
 import '../../features/analysis/presentation/color_analysis_screen.dart';
+import '../../features/outfit/presentation/outfit_detail_screen.dart';
 import '../../features/outfit/presentation/outfit_screen.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -42,6 +43,22 @@ final GoRouter appRouter = GoRouter(
         state: state,
         child: const OutfitScreen(),
       ),
+    ),
+    GoRoute(
+      path: '/outfit/:id',
+      pageBuilder: (context, state) {
+        final id = int.tryParse(state.pathParameters['id'] ?? '');
+        if (id == null) {
+          return _buildTransitionPage(
+            state: state,
+            child: const OutfitScreen(),
+          );
+        }
+        return _buildTransitionPage(
+          state: state,
+          child: OutfitDetailScreen(outfitId: id),
+        );
+      },
     ),
   ],
 );

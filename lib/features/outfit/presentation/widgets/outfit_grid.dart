@@ -7,6 +7,7 @@
 ///   - Tính năng #33: Nhấn vào → chi tiết + nút Shopee
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../outfit_controller.dart';
 import '../../domain/outfit_result.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -155,7 +156,7 @@ class _OutfitCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // Navigate tới OutfitDetailScreen — Tính năng #32
-        // context.push('/outfit/${outfit.id}');
+        context.push('/outfit/${outfit.id}');
       },
       child: Container(
         decoration: BoxDecoration(
