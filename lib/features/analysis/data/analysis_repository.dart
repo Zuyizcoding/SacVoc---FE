@@ -117,7 +117,11 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
         final detail = e.response?.data?['detail'] ?? '';
         return Exception('Ảnh không hợp lệ: $detail');
       case 429:
-        return Exception('Vui lòng đợi 1 phút rồi thử lại.');
+        final detail = e.response?.data?['detail'];
+        if (detail is String && detail.isNotEmpty) {
+          return Exception(detail);
+        }
+        return Exception('Hệ thống AI đang quá tải. Vui lòng thử lại sau.');
       case 503:
         return Exception('AI đang bận. Thử lại sau 5 giây.');
       default:

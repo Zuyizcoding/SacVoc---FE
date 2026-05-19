@@ -40,9 +40,6 @@ class SeasonGradientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // 8pt grid: margin 16 (bội 8)
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
       // Colored shadow (ui-ux-design #3)
       // Bóng dùng màu gradient chính với opacity thấp — cảm giác nổi tự nhiên
       decoration: BoxDecoration(
@@ -100,8 +97,7 @@ class SeasonGradientCard extends StatelessWidget {
                       color: Colors.white.withOpacity(0.9),
                       height: 1.5,
                     ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
                   ),
                   const SizedBox(height: 16),  // bội 8
 

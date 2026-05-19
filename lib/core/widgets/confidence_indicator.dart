@@ -10,6 +10,8 @@
 ///   ConfidenceIndicator(confidence: 0.87, label: 'Độ tự tin')
 import 'package:flutter/material.dart';
 
+import '../theme/figma_palette.dart';
+
 class ConfidenceIndicator extends StatelessWidget {
   /// Giá trị 0.0 → 1.0 (VD: 0.87 = 87%)
   final double confidence;
@@ -29,20 +31,21 @@ class ConfidenceIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final percentage = (confidence * 100).toInt();
     final color = _getColor();
-    final backgroundColor = color.withOpacity(0.12);
+    final backgroundColor = color.withValues(alpha: 0.12);
 
     return Container(
       // 8pt grid: padding 16
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),        // ui-ux-design #3: nền sáng
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(16), // bội 8
         // Bóng đổ mềm — opacity thấp (ui-ux-design #3)
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.08),
+            color: FigmaPalette.shadowColor.withValues(alpha: 0.16),
             blurRadius: 16,              // bội 8
             offset: const Offset(0, 4),
           ),
@@ -61,7 +64,7 @@ class ConfidenceIndicator extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: Colors.grey.shade700,
+                  color: scheme.onSurface.withValues(alpha: 0.70),
                 ),
               ),
               // Percentage (Heading — SemiBold | ui-ux-design #4)
@@ -103,7 +106,7 @@ class ConfidenceIndicator extends StatelessWidget {
                         // Gradient nhẹ cho thanh — đẹp hơn flat color
                         gradient: LinearGradient(
                           colors: [
-                            color.withOpacity(0.7),
+                            color.withValues(alpha: 0.70),
                             color,
                           ],
                         ),
@@ -123,7 +126,7 @@ class ConfidenceIndicator extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w300,
-              color: Colors.grey.shade500,
+              color: scheme.onSurface.withValues(alpha: 0.55),
             ),
           ),
         ],
@@ -136,9 +139,9 @@ class ConfidenceIndicator extends StatelessWidget {
   ///   60-79% → Vàng cam (khá chắc)
   ///   < 60% → Đỏ (ảnh kém, cần chụp lại)
   Color _getColor() {
-    if (confidence >= 0.8) return const Color(0xFF4CAF50);  // Green
-    if (confidence >= 0.6) return const Color(0xFFFF9800);  // Orange
-    return const Color(0xFFF44336);                          // Red
+    if (confidence >= 0.8) return FigmaPalette.success;
+    if (confidence >= 0.6) return FigmaPalette.warning;
+    return FigmaPalette.danger;
   }
 
   /// Mô tả tiếng Việt theo mức confidence

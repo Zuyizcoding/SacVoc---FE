@@ -12,11 +12,23 @@ import '../../../core/widgets/confidence_indicator.dart';
 import '../../../core/widgets/season_gradient_card.dart';
 import 'analysis_controller.dart';
 
-class HistoryScreen extends ConsumerWidget {
+class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends ConsumerState<HistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure we always fetch the latest result when entering the screen.
+    Future.microtask(() => ref.read(analysisHistoryProvider.notifier).refresh());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final historyState = ref.watch(analysisHistoryProvider);
 
     return Scaffold(

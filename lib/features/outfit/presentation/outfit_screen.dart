@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/widgets/app_scaffold.dart';
 import '../data/outfit_repository.dart';
 import '../domain/outfit_result.dart';
 import 'outfit_controller.dart';
@@ -82,9 +83,10 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
       }
     });
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('Gợi ý trang phục')),
-      body: const OutfitGrid(),
+      padding: EdgeInsets.zero,
+      child: const OutfitGrid(),
     );
   }
 }

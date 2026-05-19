@@ -42,10 +42,17 @@ class ColorAnalysisController extends AsyncNotifier<ColorResult?> {
     state = const AsyncValue.loading();
 
     // Gọi Repository (mobile-flutter #3: UI không gọi HTTP trực tiếp)
-    state = await AsyncValue.guard(() async {
+    final nextState = await AsyncValue.guard(() async {
       final repository = ref.read(analysisRepositoryProvider);
       return repository.analyzeColor(imageFile);
     });
+
+    state = nextState;
+
+    // Invalidate history so "Xem lại kết quả" always shows the latest result.
+    if (nextState.hasValue && nextState.value != null) {
+      ref.invalidate(analysisHistoryProvider);
+    }
   }
 
   /// Reset kết quả — cho phép phân tích lại
@@ -74,10 +81,16 @@ class BodyAnalysisController extends AsyncNotifier<BodyResult?> {
   Future<void> analyzeImage(File imageFile) async {
     state = const AsyncValue.loading();
 
-    state = await AsyncValue.guard(() async {
+    final nextState = await AsyncValue.guard(() async {
       final repository = ref.read(analysisRepositoryProvider);
       return repository.analyzeBody(imageFile);
     });
+
+    state = nextState;
+
+    if (nextState.hasValue && nextState.value != null) {
+      ref.invalidate(analysisHistoryProvider);
+    }
   }
 
   void reset() {

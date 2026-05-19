@@ -5,12 +5,15 @@
 ///   - ui-ux-design #3: Bóng đổ mềm, nền #FAFAFA
 ///   - Tính năng #31: Hiển thị 6 outfit
 ///   - Tính năng #33: Nhấn vào → chi tiết + nút Shopee
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../outfit_controller.dart';
 import '../../domain/outfit_result.dart';
-import '../../../../core/theme/app_theme.dart';
 
 
 class OutfitGrid extends ConsumerWidget {
@@ -21,8 +24,8 @@ class OutfitGrid extends ConsumerWidget {
     final outfitState = ref.watch(outfitControllerProvider);
 
     return outfitState.when(
-      // ─── Loading: Shimmer placeholder ───
-      loading: () => _buildShimmerGrid(),
+      // ─── Loading: Placeholder list ───
+      loading: () => _buildLoadingList(),
 
       // ─── Error: Thông báo tiếng Việt ───
       error: (error, _) => _buildErrorState(context, ref, error),
@@ -37,45 +40,51 @@ class OutfitGrid extends ConsumerWidget {
             child: Text('Chưa có dữ liệu trang phục. Vui lòng thử lại sau.'),
           );
         }
-        return _buildGrid(context, result.outfits);
+        return _buildList(context, result.outfits);
       },
     );
   }
 
-  /// Lưới 2 cột — 8pt grid spacing
-  Widget _buildGrid(BuildContext context, List<OutfitItem> outfits) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppTheme.spacing16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: AppTheme.spacing16,   // bội 8
-        mainAxisSpacing: AppTheme.spacing16,     // bội 8
-        childAspectRatio: 0.65,                  // ảnh dọc
-      ),
+  /// List 1 cột — đúng yêu cầu port Figma
+  Widget _buildList(BuildContext context, List<OutfitItem> outfits) {
+    return ListView.separated(
+      padding: AppSpacing.pagePadding,
       itemCount: outfits.length,
-      itemBuilder: (context, index) => _OutfitCard(outfit: outfits[index]),
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s16),
+      itemBuilder: (context, index) => _OutfitListItem(outfit: outfits[index]),
     );
   }
 
-  /// Shimmer loading (Tính năng #31 — shimmer loading)
-  Widget _buildShimmerGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppTheme.spacing16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: AppTheme.spacing16,
-        mainAxisSpacing: AppTheme.spacing16,
-        childAspectRatio: 0.65,
-      ),
+  Widget _buildLoadingList() {
+    return ListView.separated(
+      padding: AppSpacing.pagePadding,
       itemCount: 6,
-      itemBuilder: (_, __) => Container(
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s16),
+      itemBuilder: (_, __) => AppCard(
+        child: Row(
+          children: [
+            Container(
+              width: 88,
+              height: 112,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(AppRadii.r16),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.s16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 14, color: Colors.grey.shade200),
+                  const SizedBox(height: AppSpacing.s8),
+                  Container(height: 14, width: 180, color: Colors.grey.shade200),
+                  const SizedBox(height: AppSpacing.s16),
+                  Container(height: 12, width: 120, color: Colors.grey.shade200),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -88,19 +97,19 @@ class OutfitGrid extends ConsumerWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacing24),
+        padding: AppSpacing.pagePadding,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.info_outline, size: 48, color: Colors.orange.shade300),
-            const SizedBox(height: AppTheme.spacing16),
+            const SizedBox(height: AppSpacing.s16),
             Text(
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: AppTheme.spacing24),
-            ElevatedButton(
+            const SizedBox(height: AppSpacing.s24),
+            FilledButton(
               onPressed: () {
                 ref.read(outfitControllerProvider.notifier)
                    .loadRecommendations();
@@ -117,19 +126,19 @@ class OutfitGrid extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacing24),
+        padding: AppSpacing.pagePadding,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.checkroom, size: 64, color: Colors.grey.shade300),
-            const SizedBox(height: AppTheme.spacing16),
+            const SizedBox(height: AppSpacing.s16),
             Text(
               'Nhấn bên dưới để xem gợi ý trang phục\nphù hợp với màu sắc và dáng người của bạn',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: AppTheme.spacing24),
-            ElevatedButton.icon(
+            const SizedBox(height: AppSpacing.s24),
+            FilledButton.icon(
               icon: const Icon(Icons.auto_awesome),
               label: const Text('Xem gợi ý'),
               onPressed: () {
@@ -144,96 +153,76 @@ class OutfitGrid extends ConsumerWidget {
   }
 }
 
-
-/// Card cho 1 outfit trong grid
-class _OutfitCard extends StatelessWidget {
+class _OutfitListItem extends StatelessWidget {
   final OutfitItem outfit;
 
-  const _OutfitCard({required this.outfit});
+  const _OutfitListItem({required this.outfit});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate tới OutfitDetailScreen — Tính năng #32
-        context.push('/outfit/${outfit.id}');
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          // Bóng đổ mềm (ui-ux-design #3)
-          boxShadow: AppTheme.cardShadow,
-        ),
-        child: Column(
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadii.r16),
+      onTap: () => context.push('/outfit/${outfit.id}'),
+      child: AppCard(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ─── Ảnh outfit ───
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppTheme.radiusMedium),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadii.r16),
+              child: CachedNetworkImage(
+                imageUrl: outfit.imageUrl,
+                width: 88,
+                height: 112,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  width: 88,
+                  height: 112,
+                  color: Colors.grey.shade200,
                 ),
-                child: Image.network(
-                  outfit.imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade100,
-                    child: const Icon(Icons.image_not_supported, size: 32),
-                  ),
+                errorWidget: (_, __, ___) => Container(
+                  width: 88,
+                  height: 112,
+                  color: Colors.grey.shade100,
+                  child: const Icon(Icons.image_not_supported, size: 24),
                 ),
               ),
             ),
-
-            // ─── Info section ───
-            Padding(
-              padding: const EdgeInsets.all(AppTheme.spacing8),
+            const SizedBox(width: AppSpacing.s16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Tên outfit (Body — SemiBold)
                   Text(
                     outfit.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 4),
-                  // Giá + match score (Caption — Light)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        outfit.priceRange,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${(outfit.score * 100).toInt()}%',
-                          style: TextStyle(
-                            fontSize: 10,
+                  const SizedBox(height: AppSpacing.s8),
+                  Text(
+                    outfit.priceRange,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: AppSpacing.s8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.s8,
+                      vertical: AppSpacing.s4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(AppRadii.r8),
+                    ),
+                    child: Text(
+                      'Match ${(outfit.score * 100).toInt()}%',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.primary,
                           ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),

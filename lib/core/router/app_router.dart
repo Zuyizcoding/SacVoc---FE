@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../theme/app_tokens.dart';
+import '../widgets/app_buttons.dart';
+import '../widgets/app_scaffold.dart';
 import '../../features/analysis/presentation/body_analysis_screen.dart';
 import '../../features/analysis/presentation/color_analysis_screen.dart';
 import '../../features/analysis/presentation/history_screen.dart';
@@ -165,36 +168,31 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('Sắc Vóc')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ElevatedButton(
-                onPressed: () => context.push('/color'),
-                child: const Text('Phân tích màu sắc'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => context.push('/body'),
-                child: const Text('Phân tích dáng người'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => context.push('/outfit'),
-                child: const Text('Gợi ý trang phục'),
-              ),
-              const SizedBox(height: 16),
-              OutlinedButton(
-                onPressed: () => context.push('/history'),
-                child: const Text('Xem lại kết quả'),
-              ),
-            ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppPrimaryButton(
+            label: 'Phân tích màu sắc',
+            onPressed: () => context.push('/color'),
           ),
-        ),
+          const SizedBox(height: AppSpacing.s16),
+          AppPrimaryButton(
+            label: 'Phân tích dáng người',
+            onPressed: () => context.push('/body'),
+          ),
+          const SizedBox(height: AppSpacing.s16),
+          AppPrimaryButton(
+            label: 'Gợi ý trang phục',
+            onPressed: () => context.push('/outfit'),
+          ),
+          const SizedBox(height: AppSpacing.s16),
+          AppSecondaryButton(
+            label: 'Xem lại kết quả',
+            onPressed: () => context.push('/history'),
+          ),
+        ],
       ),
     );
   }
