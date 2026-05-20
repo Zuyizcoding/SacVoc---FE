@@ -1,4 +1,4 @@
-/// Repository phân tích ảnh — giao tiếp với Backend API.
+﻿/// Repository phân tích ảnh — giao tiếp với Backend API.
 ///
 /// Tuân thủ:
 ///   - mobile-flutter #3: Abstract class → dễ Mock test
@@ -113,9 +113,17 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
   /// Map DioException → thông báo tiếng Việt (Tính năng #34)
   Exception _mapDioError(DioException e) {
     switch (e.response?.statusCode) {
+      case 400:
+        return Exception(
+          'Không phân tích được ảnh hiện tại. '
+          'Bạn thử ảnh sáng hơn, rõ hơn và thấy toàn thân nhé.',
+        );
+
       case 422:
-        final detail = e.response?.data?['detail'] ?? '';
-        return Exception('Ảnh không hợp lệ: $detail');
+        return Exception(
+          'Ảnh chưa đủ rõ để phân tích chính xác. '
+          'Bạn có thể thử ảnh khác rõ hơn.',
+        );
       case 429:
         final detail = e.response?.data?['detail'];
         if (detail is String && detail.isNotEmpty) {
@@ -141,3 +149,5 @@ final analysisRepositoryProvider = Provider<AnalysisRepository>((ref) {
   final dio = ref.watch(dioProvider);
   return AnalysisRepositoryImpl(dio);
 });
+
+

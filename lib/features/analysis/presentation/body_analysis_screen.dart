@@ -1,13 +1,8 @@
-// VÍ DỤ cách dùng AsyncValue trong Widget.
-//
-// Tuân thủ:
-//   - mobile-flutter #2: Widget chỉ hiển thị — logic ở Controller
-//   - mobile-flutter #4: xử lý 3 trạng thái data/loading/error
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_tokens.dart';
@@ -41,6 +36,7 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
   ) async {
     if (_isPicking) return;
     setState(() => _isPicking = true);
+
     final picker = ImagePicker();
     final file = await picker.pickImage(source: source, imageQuality: 90);
 
@@ -49,10 +45,7 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
 
     if (file == null) return;
 
-    await ref
-        .read(bodyAnalysisProvider.notifier)
-        .analyzeImage(File(file.path));
-
+    await ref.read(bodyAnalysisProvider.notifier).analyzeImage(File(file.path));
     if (!context.mounted) return;
   }
 
@@ -89,25 +82,25 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
           AppPrimaryButton(
             label: 'Chụp ảnh',
             icon: Icons.camera_alt_outlined,
-            onPressed: isBusy
-                ? null
-                : () => _pickAndAnalyze(context, ref, ImageSource.camera),
+            onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.camera),
           ),
           const SizedBox(height: AppSpacing.s16),
           AppSecondaryButton(
             label: 'Chọn ảnh',
             icon: Icons.photo_library_outlined,
-            onPressed: isBusy
-                ? null
-                : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
+            onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
+          ),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Mẹo: Ảnh nhỏ vẫn phân tích được. Để kết quả ổn định hơn, hãy chụp ảnh sáng, rõ và thấy toàn thân.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: AppSpacing.s24),
           Expanded(
             child: bodyState.when(
               loading: () => const AppLoading(),
-              error: (error, _) => AppErrorState(
-                message: _humanizeError(error),
-              ),
+              error: (error, _) => AppErrorState(message: _humanizeError(error)),
               data: (result) {
                 if (result == null) {
                   return Center(
@@ -125,7 +118,6 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Hero card (adds visual consistency with Color feature)
                       Container(
                         decoration: BoxDecoration(
                           gradient: FigmaPalette.ctaGradient,
@@ -170,48 +162,32 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.s16),
-
-                      // Styling tips
                       AppCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Styling tips',
-                              style: theme.textTheme.titleMedium,
-                            ),
+                            Text('Gợi ý phối đồ', style: theme.textTheme.titleMedium),
                             const SizedBox(height: AppSpacing.s8),
                             ...result.stylingTips.map(
                               (tip) => Padding(
                                 padding: const EdgeInsets.only(bottom: 6),
-                                child: Text(
-                                  '• $tip',
-                                  style: theme.textTheme.bodyMedium,
-                                ),
+                                child: Text('- $tip', style: theme.textTheme.bodyMedium),
                               ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: AppSpacing.s16),
-
-                      // Avoid
                       AppCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Nên tránh',
-                              style: theme.textTheme.titleMedium,
-                            ),
+                            Text('Nên tránh', style: theme.textTheme.titleMedium),
                             const SizedBox(height: AppSpacing.s8),
                             ...result.avoid.map(
                               (tip) => Padding(
                                 padding: const EdgeInsets.only(bottom: 6),
-                                child: Text(
-                                  '• $tip',
-                                  style: theme.textTheme.bodyMedium,
-                                ),
+                                child: Text('- $tip', style: theme.textTheme.bodyMedium),
                               ),
                             ),
                           ],

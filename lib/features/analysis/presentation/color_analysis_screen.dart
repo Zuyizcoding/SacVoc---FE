@@ -1,13 +1,8 @@
-// VÍ DỤ cách dùng AsyncValue trong Widget.
-//
-// Tuân thủ:
-//   - mobile-flutter #2: Widget chỉ hiển thị — logic ở Controller
-//   - mobile-flutter #4: xử lý 3 trạng thái data/loading/error
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_tokens.dart';
@@ -24,8 +19,7 @@ class ColorAnalysisScreen extends ConsumerStatefulWidget {
   const ColorAnalysisScreen({super.key});
 
   @override
-  ConsumerState<ColorAnalysisScreen> createState() =>
-      _ColorAnalysisScreenState();
+  ConsumerState<ColorAnalysisScreen> createState() => _ColorAnalysisScreenState();
 }
 
 class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
@@ -44,6 +38,7 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
   ) async {
     if (_isPicking) return;
     setState(() => _isPicking = true);
+
     final picker = ImagePicker();
     final file = await picker.pickImage(source: source, imageQuality: 90);
 
@@ -52,10 +47,7 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
 
     if (file == null) return;
 
-    await ref
-        .read(colorAnalysisProvider.notifier)
-        .analyzeImage(File(file.path));
-
+    await ref.read(colorAnalysisProvider.notifier).analyzeImage(File(file.path));
     if (!context.mounted) return;
   }
 
@@ -92,25 +84,25 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
           AppPrimaryButton(
             label: 'Chụp ảnh',
             icon: Icons.camera_alt_outlined,
-            onPressed: isBusy
-                ? null
-                : () => _pickAndAnalyze(context, ref, ImageSource.camera),
+            onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.camera),
           ),
           const SizedBox(height: AppSpacing.s16),
           AppSecondaryButton(
             label: 'Chọn ảnh',
             icon: Icons.photo_library_outlined,
-            onPressed: isBusy
-                ? null
-                : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
+            onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
+          ),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Mẹo: Ảnh nhỏ vẫn phân tích được. Để kết quả ổn định hơn, hãy chụp selfie sáng và rõ khuôn mặt.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: AppSpacing.s24),
           Expanded(
             child: colorState.when(
               loading: () => const AppLoading(),
-              error: (error, _) => AppErrorState(
-                message: _humanizeError(error),
-              ),
+              error: (error, _) => AppErrorState(message: _humanizeError(error)),
               data: (result) {
                 if (result == null) {
                   return Center(
@@ -141,17 +133,11 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Bảng màu cá nhân',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
+                            Text('Bảng màu cá nhân', style: Theme.of(context).textTheme.titleMedium),
                             const SizedBox(height: AppSpacing.s16),
                             ColorPaletteRow(hexColors: result.palette),
                             const SizedBox(height: AppSpacing.s16),
-                            Text(
-                              result.advice,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
+                            Text(result.advice, style: Theme.of(context).textTheme.bodyMedium),
                           ],
                         ),
                       ),

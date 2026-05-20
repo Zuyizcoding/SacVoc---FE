@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -20,9 +20,9 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
   bool _isDialogShowing = false;
   bool _hasTriggeredHaptic = false;
 
-  // NOTE: Backend chỉ filter giới tính khi request có `gender=`.
-  // Nếu app chưa có UI chọn giới tính, bạn có thể đổi mặc định ở đây.
-  static const String _defaultGender = 'any';
+  // NOTE: Backend chá»‰ filter giá»›i tÃ­nh khi request cÃ³ `gender=`.
+  // Náº¿u app chÆ°a cÃ³ UI chá»n giá»›i tÃ­nh, báº¡n cÃ³ thá»ƒ Ä‘á»•i máº·c Ä‘á»‹nh á»Ÿ Ä‘Ã¢y.
+  static const String _defaultGender = 'male';
 
   @override
   void initState() {
@@ -43,9 +43,9 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Thiếu dữ liệu phân tích'),
+          title: const Text('Thiáº¿u dá»¯ liá»‡u phÃ¢n tÃ­ch'),
           content: const Text(
-            'Bạn cần phân tích màu sắc và dáng người trước',
+            'Báº¡n cáº§n phÃ¢n tÃ­ch mÃ u sáº¯c vÃ  dÃ¡ng ngÆ°á»i trÆ°á»›c',
           ),
           actions: [
             TextButton(
@@ -53,14 +53,14 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
                 Navigator.of(dialogContext).pop();
                 context.go('/color');
               },
-              child: const Text('Phân tích màu sắc'),
+              child: const Text('PhÃ¢n tÃ­ch mÃ u sáº¯c'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 context.go('/body');
               },
-              child: const Text('Phân tích dáng'),
+              child: const Text('PhÃ¢n tÃ­ch dÃ¡ng'),
             ),
           ],
         );
@@ -90,9 +90,10 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
     });
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('Gợi ý trang phục')),
+      appBar: AppBar(title: const Text('Gá»£i Ã½ trang phá»¥c')),
       padding: EdgeInsets.zero,
       child: const OutfitGrid(),
     );
   }
 }
+
