@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/figma_palette.dart';
 import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -118,30 +119,105 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
                   );
                 }
 
+                final theme = Theme.of(context);
+
                 return SingleChildScrollView(
-                  child: AppCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Shape: ${result.shape}',
-                          style: Theme.of(context).textTheme.titleMedium,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Hero card (adds visual consistency with Color feature)
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: FigmaPalette.ctaGradient,
+                          borderRadius: BorderRadius.circular(AppRadii.r16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadowTint(0.10),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: AppSpacing.s8),
-                        Text(
-                          result.explanation,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.s16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dáng người',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.s8),
+                              Text(
+                                result.shape,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.s8),
+                              Text(
+                                result.explanation,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.90),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: AppSpacing.s16),
-                        const Text('Styling tips:'),
-                        const SizedBox(height: AppSpacing.s8),
-                        ...result.stylingTips.map((tip) => Text('• $tip')),
-                        const SizedBox(height: AppSpacing.s16),
-                        const Text('Nên tránh:'),
-                        const SizedBox(height: AppSpacing.s8),
-                        ...result.avoid.map((tip) => Text('• $tip')),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: AppSpacing.s16),
+
+                      // Styling tips
+                      AppCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Styling tips',
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.s8),
+                            ...result.stylingTips.map(
+                              (tip) => Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Text(
+                                  '• $tip',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.s16),
+
+                      // Avoid
+                      AppCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Nên tránh',
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.s8),
+                            ...result.avoid.map(
+                              (tip) => Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Text(
+                                  '• $tip',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },

@@ -19,6 +19,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
+import '../theme/figma_palette.dart';
+
 class SeasonGradientCard extends StatelessWidget {
   final String subSeason;
   final String primarySeason;
@@ -46,7 +48,7 @@ class SeasonGradientCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16), // bội 8
         boxShadow: [
           BoxShadow(
-            color: gradientFrom.withOpacity(0.3),  // bóng màu, KHÔNG đen
+            color: gradientFrom.withValues(alpha: 0.30), // bóng màu, KHÔNG đen
             blurRadius: 24,                         // bội 8
             offset: const Offset(0, 8),             // bội 8
             spreadRadius: 0,
@@ -59,16 +61,37 @@ class SeasonGradientCard extends StatelessWidget {
         child: Stack(
           children: [
             // ─── Layer 1: Gradient Background ───
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24), // bội 8
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [gradientFrom, gradientTo],
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [gradientFrom, gradientTo],
+                  ),
                 ),
               ),
+            ),
+
+            // ─── Layer 1.5: Scrim overlay (improves contrast on bright pastels) ───
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      FigmaPalette.black.withValues(alpha: 0.06),
+                      FigmaPalette.black.withValues(alpha: 0.18),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // ─── Content ───
+            Padding(
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -94,31 +117,10 @@ class SeasonGradientCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,  // ui-ux-design #4: Body Regular
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.90),
                       height: 1.5,
                     ),
                     softWrap: true,
-                  ),
-                  const SizedBox(height: 16),  // bội 8
-
-                  // ─── Confidence Row (Caption — Light) ───
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.auto_awesome,
-                        color: Colors.white.withOpacity(0.8),
-                        size: 16,
-                      ),
-                      const SizedBox(width: 8),  // bội 8
-                      Text(
-                        'Độ tự tin: ${(confidence * 100).toInt()}%',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w300,  // ui-ux-design #4: Caption Light
-                          color: Colors.white.withOpacity(0.8),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
@@ -140,7 +142,7 @@ class SeasonGradientCard extends StatelessWidget {
                       vertical: 8,     // bội 8
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                     ),
                     child: Text(
                       _getSeasonEmoji(primarySeason),
@@ -161,7 +163,7 @@ class SeasonGradientCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // bội 8
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.20),
         borderRadius: BorderRadius.circular(24), // bội 8
       ),
       child: Text(

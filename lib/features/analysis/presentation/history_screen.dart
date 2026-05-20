@@ -6,7 +6,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/figma_palette.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/app_states.dart';
 import '../../../core/widgets/color_palette_row.dart';
 import '../../../core/widgets/confidence_indicator.dart';
 import '../../../core/widgets/season_gradient_card.dart';
@@ -31,104 +35,147 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Widget build(BuildContext context) {
     final historyState = ref.watch(analysisHistoryProvider);
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('Xem lại kết quả')),
-      body: SafeArea(
-        child: historyState.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppTheme.spacing24),
+      child: historyState.when(
+        loading: () => const AppLoading(),
+        error: (error, _) => AppErrorState(
+          message: error.toString(),
+        ),
+        data: (result) {
+          final color = result?.color;
+          final body = result?.body;
+
+          if (color == null && body == null) {
+            return Center(
               child: Text(
-                'Lỗi: ${error.toString()}',
+                'Chưa có lịch sử phân tích.',
+                style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
-            ),
-          ),
-          data: (result) {
-            final color = result?.color;
-            final body = result?.body;
-
-            if (color == null && body == null) {
-              return const Center(
-                child: Text('Chưa có lịch sử phân tích.'),
-              );
-            }
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.spacing16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (color != null) ...[
-                    SeasonGradientCard(
-                      subSeason: color.subSeason,
-                      primarySeason: color.primarySeason,
-                      confidence: color.confidence,
-                      explanation: color.explanation,
-                      gradientFrom: _hexToColor(color.gradientFrom),
-                      gradientTo: _hexToColor(color.gradientTo),
-                    ),
-                    const SizedBox(height: AppTheme.spacing16),
-                    ConfidenceIndicator(confidence: color.confidence),
-                    const SizedBox(height: AppTheme.spacing16),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppTheme.spacing16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bảng màu cá nhân',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: AppTheme.spacing16),
-                            ColorPaletteRow(hexColors: color.palette),
-                            const SizedBox(height: AppTheme.spacing16),
-                            Text(
-                              color.advice,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppTheme.spacing24),
-                  ],
-                  if (body != null) ...[
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppTheme.spacing16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dáng người: ${body.shape}',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: AppTheme.spacing8),
-                            Text(
-                              body.explanation,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: AppTheme.spacing16),
-                            const Text('Styling tips:'),
-                            const SizedBox(height: AppTheme.spacing8),
-                            ...body.stylingTips.map((tip) => Text('• $tip')),
-                            const SizedBox(height: AppTheme.spacing16),
-                            const Text('Nên tránh:'),
-                            const SizedBox(height: AppTheme.spacing8),
-                            ...body.avoid.map((tip) => Text('• $tip')),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
             );
-          },
-        ),
+          }
+
+          final theme = Theme.of(context);
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (color != null) ...[
+                  SeasonGradientCard(
+                    subSeason: color.subSeason,
+                    primarySeason: color.primarySeason,
+                    confidence: color.confidence,
+                    explanation: color.explanation,
+                    gradientFrom: _hexToColor(color.gradientFrom),
+                    gradientTo: _hexToColor(color.gradientTo),
+                  ),
+                  const SizedBox(height: AppSpacing.s16),
+                  ConfidenceIndicator(confidence: color.confidence),
+                  const SizedBox(height: AppSpacing.s16),
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Bảng màu cá nhân',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.s16),
+                        ColorPaletteRow(hexColors: color.palette),
+                        const SizedBox(height: AppSpacing.s16),
+                        Text(
+                          color.advice,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.s24),
+                ],
+                if (body != null) ...[
+                  // Match BodyAnalysisScreen structure
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: FigmaPalette.ctaGradient,
+                      borderRadius: BorderRadius.circular(AppRadii.r16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadowTint(0.10),
+                          blurRadius: 24,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.s16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Dáng người',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.s8),
+                          Text(
+                            body.shape,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.s8),
+                          Text(
+                            body.explanation,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.90),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.s16),
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Styling tips', style: theme.textTheme.titleMedium),
+                        const SizedBox(height: AppSpacing.s8),
+                        ...body.stylingTips.map(
+                          (tip) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Text('• $tip', style: theme.textTheme.bodyMedium),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.s16),
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Nên tránh', style: theme.textTheme.titleMedium),
+                        const SizedBox(height: AppSpacing.s8),
+                        ...body.avoid.map(
+                          (tip) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Text('• $tip', style: theme.textTheme.bodyMedium),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }
