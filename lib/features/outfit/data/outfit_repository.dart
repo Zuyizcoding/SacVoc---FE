@@ -12,7 +12,10 @@ import '../domain/outfit_result.dart';
 /// Interface — mock được khi test
 abstract class OutfitRepository {
   /// Gợi ý 6 outfit dựa trên F1+F2 đã phân tích
-  Future<OutfitResult> getRecommendations({String occasion = 'daily'});
+  Future<OutfitResult> getRecommendations({
+    String occasion = 'daily',
+    String gender = 'any',
+  });
 
   /// Chi tiết 1 outfit
   Future<OutfitDetail> getOutfitDetail(int outfitId);
@@ -28,11 +31,15 @@ class OutfitRepositoryImpl implements OutfitRepository {
   @override
   Future<OutfitResult> getRecommendations({
     String occasion = 'daily',
+    String gender = 'any',
   }) async {
     try {
       final response = await _dio.get(
         '/api/v1/outfits/recommend',
-        queryParameters: {'occasion': occasion},
+        queryParameters: {
+          'occasion': occasion,
+          'gender': gender,
+        },
       );
 
       final apiResponse = ApiResponse.fromJson(

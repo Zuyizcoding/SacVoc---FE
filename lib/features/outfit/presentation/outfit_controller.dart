@@ -52,6 +52,7 @@ class OutfitController extends AsyncNotifier<OutfitResult?> {
   ///   → UI bắt exception này để hiện dialog hướng dẫn.
   Future<void> loadRecommendations({
     String occasion = 'daily',
+    String gender = 'any',
   }) async {
     // Chuyển sang loading state
     state = const AsyncLoading();
@@ -59,12 +60,15 @@ class OutfitController extends AsyncNotifier<OutfitResult?> {
     // Gọi API
     state = await AsyncValue.guard(() async {
       final repo = ref.read(outfitRepositoryProvider);
-      return repo.getRecommendations(occasion: occasion);
+      return repo.getRecommendations(occasion: occasion, gender: gender);
     });
   }
 
   /// Refresh — gọi lại API (VD: sau khi phân tích lại F1/F2)
-  Future<void> refresh({String occasion = 'daily'}) async {
-    await loadRecommendations(occasion: occasion);
+  Future<void> refresh({
+    String occasion = 'daily',
+    String gender = 'any',
+  }) async {
+    await loadRecommendations(occasion: occasion, gender: gender);
   }
 }

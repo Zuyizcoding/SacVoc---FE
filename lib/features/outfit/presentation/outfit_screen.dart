@@ -20,12 +20,18 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
   bool _isDialogShowing = false;
   bool _hasTriggeredHaptic = false;
 
+  // NOTE: Backend chỉ filter giới tính khi request có `gender=`.
+  // Nếu app chưa có UI chọn giới tính, bạn có thể đổi mặc định ở đây.
+  static const String _defaultGender = 'any';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      ref.read(outfitControllerProvider.notifier).loadRecommendations();
+      ref
+          .read(outfitControllerProvider.notifier)
+          .loadRecommendations(gender: _defaultGender);
     });
   }
 
