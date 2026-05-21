@@ -7,11 +7,13 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/widgets/app_buttons.dart';
+import '../../../core/widgets/advice_summary_card.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_states.dart';
 import '../../../core/widgets/color_palette_row.dart';
 import '../../../core/widgets/confidence_indicator.dart';
+import '../../../core/widgets/menswear_guidance_card.dart';
 import '../../../core/widgets/season_gradient_card.dart';
 import 'analysis_controller.dart';
 
@@ -65,15 +67,6 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
       if (next.isLoading) {
         _hasTriggeredHaptic = false;
       }
-
-      final prevHadError = previous?.hasError ?? false;
-      if (next.hasError && !prevHadError && context.mounted) {
-        final message = _humanizeError(next.error!);
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message.isEmpty ? 'Đã có lỗi xảy ra.' : message)),
-        );
-      }
     });
 
     return AppScaffold(
@@ -93,10 +86,23 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
             onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
           ),
           const SizedBox(height: AppSpacing.s8),
-          Text(
-            'Mẹo: Ảnh nhỏ vẫn phân tích được. Để kết quả ổn định hơn, hãy chụp selfie sáng và rõ khuôn mặt.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Ảnh phù hợp cho F1', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.s8),
+                Text(
+                  'Ưu tiên selfie gần, thấy rõ khuôn mặt và vùng cổ, ánh sáng đều.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.s4),
+                Text(
+                  'Tránh dùng ảnh toàn thân, chụp quá xa, ngược sáng hoặc che mặt bằng kính/phụ kiện.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: AppSpacing.s24),
           Expanded(
@@ -107,7 +113,7 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
                 if (result == null) {
                   return Center(
                     child: Text(
-                      'Vui lòng chụp/chọn ảnh selfie để bắt đầu.',
+                      'Vui lòng chụp/chọn ảnh selfie gần để bắt đầu phân tích màu sắc.',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -136,11 +142,18 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
                             Text('Bảng màu cá nhân', style: Theme.of(context).textTheme.titleMedium),
                             const SizedBox(height: AppSpacing.s16),
                             ColorPaletteRow(hexColors: result.palette),
-                            const SizedBox(height: AppSpacing.s16),
-                            Text(result.advice, style: Theme.of(context).textTheme.bodyMedium),
                           ],
                         ),
                       ),
+                      const SizedBox(height: AppSpacing.s16),
+                      AdviceSummaryCard(
+                        title: 'Tóm tắt nhanh',
+                        advice: result.advice,
+                      ),
+                      if (result.menswear != null) ...[
+                        const SizedBox(height: AppSpacing.s16),
+                        MenswearGuidanceCard(guidance: result.menswear!),
+                      ],
                     ],
                   ),
                 );

@@ -1,28 +1,28 @@
-﻿/// Outfit Repository â€” Gá»i API F3 vÃ  parse response.
+﻿/// Outfit Repository - call F3 API and parse response.
 ///
-/// TuÃ¢n thá»§:
+/// Conventions:
 ///   - mobile-flutter #2: Abstract class + Implementation
-///   - mobile-flutter #3: Repository Pattern â€” data layer tÃ¡ch biá»‡t
-///   - TÃ­nh nÄƒng #15: F1+F2â†’F3 flow â€” xá»­ lÃ½ lá»—i "chÆ°a phÃ¢n tÃ­ch"
+///   - mobile-flutter #3: Repository Pattern - separate data layer
+///   - Feature #15: F1+F2 -> F3 flow - handle "not analyzed yet" cases
 import 'package:dio/dio.dart';
 import '../../../core/network/api_response.dart';
 import '../domain/outfit_result.dart';
 
 
-/// Interface â€” mock Ä‘Æ°á»£c khi test
+/// Interface - easy to mock in tests
 abstract class OutfitRepository {
-  /// Gá»£i Ã½ 6 outfit dá»±a trÃªn F1+F2 Ä‘Ã£ phÃ¢n tÃ­ch
+  /// Recommend 6 outfits based on completed F1 + F2 analyses.
   Future<OutfitResult> getRecommendations({
     String occasion = 'daily',
     String gender = 'male',
   });
 
-  /// Chi tiáº¿t 1 outfit
+  /// Load details for a single outfit.
   Future<OutfitDetail> getOutfitDetail(int outfitId);
 }
 
 
-/// Implementation gá»i API tháº­t
+/// Production implementation backed by the API.
 class OutfitRepositoryImpl implements OutfitRepository {
   final Dio _dio;
 
@@ -48,7 +48,7 @@ class OutfitRepositoryImpl implements OutfitRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.error ?? 'Lá»—i khÃ´ng xÃ¡c Ä‘á»‹nh');
+        throw Exception(apiResponse.error ?? 'Lỗi không xác định');
       }
 
       return apiResponse.data!;
@@ -70,7 +70,7 @@ class OutfitRepositoryImpl implements OutfitRepository {
       );
 
       if (!apiResponse.success || apiResponse.data == null) {
-        throw Exception(apiResponse.error ?? 'KhÃ´ng tÃ¬m tháº¥y outfit');
+        throw Exception(apiResponse.error ?? 'Không tìm thấy outfit');
       }
 
       return apiResponse.data!;
@@ -79,53 +79,53 @@ class OutfitRepositoryImpl implements OutfitRepository {
     }
   }
 
-  /// Map DioException â†’ Exception cÃ³ message tiáº¿ng Viá»‡t rÃµ rÃ ng
-  /// TÃ­nh nÄƒng #34: Error handling toÃ n diá»‡n
+  /// Map DioException to user-friendly Vietnamese messages.
+  /// Feature #34: centralized error handling.
   Exception _mapDioError(DioException e) {
     final statusCode = e.response?.statusCode;
     final detail = e.response?.data?['detail'];
 
-    // â”€â”€â”€ F1+F2 chÆ°a hoÃ n thÃ nh (TÃ­nh nÄƒng #15) â”€â”€â”€
+    // F1 + F2 not completed yet.
     if (statusCode == 400 && detail is Map) {
       final message = detail['message'] as String? ?? '';
       final missing = detail['missing'] as List? ?? [];
 
       if (missing.contains('color') && missing.contains('body')) {
         return MissingAnalysisException(
-          'Báº¡n cáº§n phÃ¢n tÃ­ch cáº£ mÃ u sáº¯c vÃ  dÃ¡ng ngÆ°á»i trÆ°á»›c khi xem gá»£i Ã½.',
+          'Bạn cần phân tích cả màu sắc và dáng người trước khi xem gợi ý.',
           missingColor: true,
           missingBody: true,
         );
       }
       if (missing.contains('color')) {
         return MissingAnalysisException(
-          'Báº¡n cáº§n phÃ¢n tÃ­ch mÃ u sáº¯c cÃ¡ nhÃ¢n (F1) trÆ°á»›c.',
+          'Bạn cần phân tích màu sắc cá nhân (F1) trước.',
           missingColor: true,
         );
       }
       if (missing.contains('body')) {
         return MissingAnalysisException(
-          'Báº¡n cáº§n phÃ¢n tÃ­ch dÃ¡ng ngÆ°á»i (F2) trÆ°á»›c.',
+          'Bạn cần phân tích dáng người (F2) trước.',
           missingBody: true,
         );
       }
       return Exception(message);
     }
 
-    // â”€â”€â”€ Lá»—i chung â”€â”€â”€
+    // Generic API failures.
     switch (statusCode) {
       case 404:
-        return Exception('KhÃ´ng tÃ¬m tháº¥y trang phá»¥c.');
+        return Exception('Không tìm thấy trang phục.');
       case 503:
-        return Exception('Há»‡ thá»‘ng Ä‘ang báº­n. Vui lÃ²ng thá»­ láº¡i sau.');
+        return Exception('Hệ thống đang bận. Vui lòng thử lại sau.');
       default:
-        return Exception('Lá»—i káº¿t ná»‘i. Kiá»ƒm tra máº¡ng vÃ  thá»­ láº¡i.');
+        return Exception('Lỗi kết nối. Kiểm tra mạng và thử lại.');
     }
   }
 }
 
 
-/// Exception Ä‘áº·c biá»‡t â€” UI xá»­ lÃ½ Ä‘á»ƒ hiá»‡n prompt chuyá»ƒn sang F1/F2
+/// Special exception so the UI can guide users back to F1/F2 first.
 class MissingAnalysisException implements Exception {
   final String message;
   final bool missingColor;

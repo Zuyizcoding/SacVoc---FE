@@ -63,15 +63,6 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
       if (next.isLoading) {
         _hasTriggeredHaptic = false;
       }
-
-      final prevHadError = previous?.hasError ?? false;
-      if (next.hasError && !prevHadError && context.mounted) {
-        final message = _humanizeError(next.error!);
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message.isEmpty ? 'Đã có lỗi xảy ra.' : message)),
-        );
-      }
     });
 
     return AppScaffold(
@@ -91,10 +82,23 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
             onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
           ),
           const SizedBox(height: AppSpacing.s8),
-          Text(
-            'Mẹo: Ảnh nhỏ vẫn phân tích được. Để kết quả ổn định hơn, hãy chụp ảnh sáng, rõ và thấy toàn thân.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Ảnh phù hợp cho F2', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.s8),
+                Text(
+                  'Ưu tiên ảnh toàn thân, đứng thẳng, thấy rõ vai đến chân và để tay thả lỏng tự nhiên.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.s4),
+                Text(
+                  'Tránh crop mất chân/đầu, góc chụp lệch mạnh hoặc mặc đồ quá rộng che tỷ lệ cơ thể.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: AppSpacing.s24),
           Expanded(
@@ -105,7 +109,7 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
                 if (result == null) {
                   return Center(
                     child: Text(
-                      'Vui lòng chụp/chọn ảnh toàn thân để bắt đầu.',
+                      'Vui lòng chụp/chọn ảnh toàn thân rõ dáng để bắt đầu.',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),

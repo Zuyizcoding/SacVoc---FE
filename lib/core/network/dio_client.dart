@@ -19,7 +19,8 @@ final dioProvider = Provider<Dio>((ref) {
     BaseOptions(
       baseUrl: ApiConstants.baseUrl,
       connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 30), // Gemini có thể mất ~6s
+      // Free tier có thể phản hồi chậm hơn đáng kể khi Gemini retry ở backend.
+      receiveTimeout: const Duration(seconds: 75),
       headers: {'Content-Type': 'application/json'},
     ),
   );

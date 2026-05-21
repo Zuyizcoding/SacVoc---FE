@@ -22,6 +22,26 @@ class MakeupGuide {
   }
 }
 
+class MenswearGuide {
+  final List<String> tops;
+  final List<String> bottoms;
+  final List<String> accessories;
+
+  const MenswearGuide({
+    required this.tops,
+    required this.bottoms,
+    required this.accessories,
+  });
+
+  factory MenswearGuide.fromJson(Map<String, dynamic> json) {
+    return MenswearGuide(
+      tops: List<String>.from(json['tops'] as List? ?? const []),
+      bottoms: List<String>.from(json['bottoms'] as List? ?? const []),
+      accessories: List<String>.from(json['accessories'] as List? ?? const []),
+    );
+  }
+}
+
 class ColorResult {
   final String subSeason;
   final String primarySeason;
@@ -31,6 +51,7 @@ class ColorResult {
   final List<String> palette;     // 6 hex codes
   final MakeupGuide makeup;
   final String advice;
+  final MenswearGuide? menswear;
   final String gradientFrom;
   final String gradientTo;
 
@@ -59,6 +80,7 @@ class ColorResult {
     required this.palette,
     required this.makeup,
     required this.advice,
+    required this.menswear,
     required this.gradientFrom,
     required this.gradientTo,
   });
@@ -81,6 +103,9 @@ class ColorResult {
       palette: List<String>.from(json['palette'] as List),
       makeup: MakeupGuide.fromJson(json['makeup'] as Map<String, dynamic>),
       advice: json['advice'] as String,
+      menswear: (json['menswear'] as Map<String, dynamic>?) != null
+          ? MenswearGuide.fromJson(json['menswear'] as Map<String, dynamic>)
+          : null,
       gradientFrom: gradientFrom,
       gradientTo: gradientTo,
     );

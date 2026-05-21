@@ -20,8 +20,8 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
   bool _isDialogShowing = false;
   bool _hasTriggeredHaptic = false;
 
-  // NOTE: Backend chá»‰ filter giá»›i tÃ­nh khi request cÃ³ `gender=`.
-  // Náº¿u app chÆ°a cÃ³ UI chá»n giá»›i tÃ­nh, báº¡n cÃ³ thá»ƒ Ä‘á»•i máº·c Ä‘á»‹nh á»Ÿ Ä‘Ã¢y.
+  // Backend only filters by gender when `gender=` is sent.
+  // Until the app has a gender picker, keep the default here.
   static const String _defaultGender = 'male';
 
   @override
@@ -43,9 +43,9 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Thiáº¿u dá»¯ liá»‡u phÃ¢n tÃ­ch'),
+          title: const Text('Thiếu dữ liệu phân tích'),
           content: const Text(
-            'Báº¡n cáº§n phÃ¢n tÃ­ch mÃ u sáº¯c vÃ  dÃ¡ng ngÆ°á»i trÆ°á»›c',
+            'Bạn cần phân tích màu sắc và dáng người trước',
           ),
           actions: [
             TextButton(
@@ -53,14 +53,14 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
                 Navigator.of(dialogContext).pop();
                 context.go('/color');
               },
-              child: const Text('PhÃ¢n tÃ­ch mÃ u sáº¯c'),
+              child: const Text('Phân tích màu sắc'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 context.go('/body');
               },
-              child: const Text('PhÃ¢n tÃ­ch dÃ¡ng'),
+              child: const Text('Phân tích dáng'),
             ),
           ],
         );
@@ -90,7 +90,7 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
     });
 
     return AppScaffold(
-      appBar: AppBar(title: const Text('Gá»£i Ã½ trang phá»¥c')),
+      appBar: AppBar(title: const Text('Gợi ý trang phục')),
       padding: EdgeInsets.zero,
       child: const OutfitGrid(),
     );

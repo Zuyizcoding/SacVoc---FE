@@ -8,11 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/theme/figma_palette.dart';
+import '../../../core/widgets/advice_summary_card.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_states.dart';
 import '../../../core/widgets/color_palette_row.dart';
 import '../../../core/widgets/confidence_indicator.dart';
+import '../../../core/widgets/menswear_guidance_card.dart';
 import '../../../core/widgets/season_gradient_card.dart';
 import 'analysis_controller.dart';
 
@@ -84,14 +86,18 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                         ),
                         const SizedBox(height: AppSpacing.s16),
                         ColorPaletteRow(hexColors: color.palette),
-                        const SizedBox(height: AppSpacing.s16),
-                        Text(
-                          color.advice,
-                          style: theme.textTheme.bodyMedium,
-                        ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.s16),
+                  AdviceSummaryCard(
+                    title: 'Tóm tắt nhanh',
+                    advice: color.advice,
+                  ),
+                  if (color.menswear != null) ...[
+                    const SizedBox(height: AppSpacing.s16),
+                    MenswearGuidanceCard(guidance: color.menswear!),
+                  ],
                   const SizedBox(height: AppSpacing.s24),
                 ],
                 if (body != null) ...[
