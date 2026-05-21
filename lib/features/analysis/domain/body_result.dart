@@ -25,6 +25,9 @@ class BodyMeasurements {
 class BodyResult {
   final String shape;
   final double confidence;
+  final String analysisSource;
+  final double? photoQualityScore;
+  final String? photoQualityBand;
   final BodyMeasurements measurements;
   final List<String> stylingTips;
   final List<String> avoid;
@@ -33,6 +36,9 @@ class BodyResult {
   const BodyResult({
     required this.shape,
     required this.confidence,
+    required this.analysisSource,
+    required this.photoQualityScore,
+    required this.photoQualityBand,
     required this.measurements,
     required this.stylingTips,
     required this.avoid,
@@ -43,6 +49,9 @@ class BodyResult {
     return BodyResult(
       shape: json['shape'] as String,
       confidence: (json['confidence'] as num).toDouble(),
+      analysisSource: (json['analysis_source'] as String?) ?? 'live',
+      photoQualityScore: (json['photo_quality_score'] as num?)?.toDouble(),
+      photoQualityBand: json['photo_quality_band'] as String?,
       measurements: BodyMeasurements.fromJson(
         json['measurements'] as Map<String, dynamic>,
       ),

@@ -11,7 +11,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/widgets/app_buttons.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../analysis/domain/analysis_history_result.dart';
+import '../../../analysis/presentation/analysis_controller.dart';
 import '../outfit_controller.dart';
 import '../../domain/outfit_result.dart';
 
@@ -22,6 +25,7 @@ class OutfitGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final outfitState = ref.watch(outfitControllerProvider);
+    final history = ref.watch(analysisHistoryProvider).asData?.value;
 
     return outfitState.when(
       // ─── Loading: Placeholder list ───
@@ -40,18 +44,28 @@ class OutfitGrid extends ConsumerWidget {
             child: Text('Chưa có dữ liệu trang phục. Vui lòng thử lại sau.'),
           );
         }
-        return _buildList(context, result.outfits);
+        return _buildList(context, result, history);
       },
     );
   }
 
   /// List 1 cột — đúng yêu cầu port Figma
-  Widget _buildList(BuildContext context, List<OutfitItem> outfits) {
+  Widget _buildList(
+    BuildContext context,
+    OutfitResult result,
+    AnalysisHistoryResult? history,
+  ) {
+    final outfits = result.outfits;
     return ListView.separated(
       padding: AppSpacing.pagePadding,
-      itemCount: outfits.length,
+      itemCount: outfits.length + 1,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s16),
-      itemBuilder: (context, index) => _OutfitListItem(outfit: outfits[index]),
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return _OutfitContextCard(result: result, history: history);
+        }
+        return _OutfitListItem(outfit: outfits[index - 1]);
+      },
     );
   }
 
@@ -96,27 +110,28 @@ class OutfitGrid extends ConsumerWidget {
     final message = error.toString();
 
     return Center(
-      child: Padding(
-        padding: AppSpacing.pagePadding,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.info_outline, size: 48, color: Colors.orange.shade300),
-            const SizedBox(height: AppSpacing.s16),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: AppSpacing.s24),
-            FilledButton(
-              onPressed: () {
-                ref.read(outfitControllerProvider.notifier)
-                   .loadRecommendations();
-              },
-              child: const Text('Thử lại'),
-            ),
-          ],
+      child: AppCard(
+        child: Padding(
+          padding: AppSpacing.pagePadding,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.info_outline, size: 48, color: Colors.orange.shade300),
+              const SizedBox(height: AppSpacing.s16),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: AppSpacing.s24),
+              AppSecondaryButton(
+                label: 'Thử lại',
+                onPressed: () {
+                  ref.read(outfitControllerProvider.notifier).loadRecommendations();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -203,6 +218,32 @@ class _OutfitListItem extends StatelessWidget {
                     outfit.priceRange,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  if (outfit.reasonTags.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.s8),
+                    Wrap(
+                      spacing: AppSpacing.s8,
+                      runSpacing: AppSpacing.s8,
+                      children: outfit.reasonTags
+                          .take(2)
+                          .map(
+                            (tag) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.s8,
+                                vertical: AppSpacing.s4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(AppRadii.r8),
+                              ),
+                              child: Text(
+                                _reasonLabel(tag),
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.s8),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -213,7 +254,7 @@ class _OutfitListItem extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.10),
+                          .withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(AppRadii.r8),
                     ),
                     child: Text(
@@ -232,4 +273,79 @@ class _OutfitListItem extends StatelessWidget {
       ),
     );
   }
+
+  String _reasonLabel(String tag) => switch (tag) {
+        'exact_season' => 'Khớp mùa sắc',
+        'primary_season' => 'Hợp nhóm mùa',
+        'exact_shape' => 'Khớp dáng người',
+        'compatible_shape' => 'Hợp form cơ thể',
+        'color_family_match' => 'Hợp bảng màu',
+        'fit_match' => 'Fit dễ tôn dáng',
+        'formality_match' => 'Đúng dịp sử dụng',
+        'low_color_confidence' => 'Màu đang ở mức tham khảo',
+        'low_body_confidence' => 'Dáng đang ở mức tham khảo',
+        'low_color_photo_quality' => 'Ảnh màu chưa tối ưu',
+        'low_body_photo_quality' => 'Ảnh dáng chưa tối ưu',
+        _ => tag.replaceAll('_', ' '),
+      };
+}
+
+class _OutfitContextCard extends StatelessWidget {
+  final OutfitResult result;
+  final AnalysisHistoryResult? history;
+
+  const _OutfitContextCard({
+    required this.result,
+    required this.history,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = history?.color;
+    final body = history?.body;
+    final degraded = (color?.analysisSource != null && color!.analysisSource != 'live') ||
+        (body?.analysisSource != null && body!.analysisSource != 'live');
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Vì sao hệ thống gợi ý như vậy', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Dựa trên ${color?.subSeason ?? 'màu sắc'} + ${body?.shape ?? 'dáng người'} + dịp hằng ngày.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: AppSpacing.s4),
+          Text(
+            'Truy vấn F3: ${result.queryUsed}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          if (result.querySource != null) ...[
+            const SizedBox(height: AppSpacing.s4),
+            Text(
+              'Nguồn vector: ${_querySourceLabel(result.querySource!)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+          if (degraded) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Lưu ý: một phần tín hiệu F1/F2 đang ở chế độ dự phòng cho demo, nên đây là gợi ý cá nhân hóa best-effort.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.orange.shade800,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _querySourceLabel(String source) => switch (source) {
+        'precomputed_query_vector' => 'precomputed demo vectors',
+        'injected_encoder' => 'test/injected encoder',
+        _ => source.replaceAll('_', ' '),
+      };
 }

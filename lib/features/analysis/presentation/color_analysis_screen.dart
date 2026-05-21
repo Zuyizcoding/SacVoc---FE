@@ -27,6 +27,7 @@ class ColorAnalysisScreen extends ConsumerStatefulWidget {
 class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
   bool _hasTriggeredHaptic = false;
   bool _isPicking = false;
+  File? _lastPickedFile;
 
   String _humanizeError(Object error) {
     final raw = error.toString();
@@ -49,8 +50,36 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
 
     if (file == null) return;
 
-    await ref.read(colorAnalysisProvider.notifier).analyzeImage(File(file.path));
+    _lastPickedFile = File(file.path);
+    await ref.read(colorAnalysisProvider.notifier).analyzeImage(_lastPickedFile!);
     if (!context.mounted) return;
+  }
+
+  Future<void> _retryLastAnalysis() async {
+    final file = _lastPickedFile;
+    if (file == null) return;
+    await ref.read(colorAnalysisProvider.notifier).analyzeImage(file);
+  }
+
+  Widget _buildAnalysisSourceBanner(BuildContext context, String analysisSource) {
+    if (analysisSource == 'live') {
+      return const SizedBox.shrink();
+    }
+    return AppCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.wifi_tethering_error_rounded, color: Colors.orange.shade700),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Kết quả này đang dùng chế độ dự phòng cho demo vì AI tạm thời quá tải. Hãy xem đây là mẫu tham khảo minh họa thay vì phân tích live hoàn toàn.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -107,8 +136,19 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
           const SizedBox(height: AppSpacing.s24),
           Expanded(
             child: colorState.when(
-              loading: () => const AppLoading(),
-              error: (error, _) => AppErrorState(message: _humanizeError(error)),
+              loading: () => const AppLoading(
+                title: 'AI đang phân tích màu sắc',
+                icon: Icons.palette_outlined,
+                messages: [
+                  'Đang đọc undertone và độ tương phản khuôn mặt...',
+                  'Đang đối chiếu nhóm mùa sắc phù hợp nhất...',
+                  'Đang tổng hợp bảng màu và gợi ý menswear...',
+                ],
+              ),
+              error: (error, _) => AppErrorState(
+                message: _humanizeError(error),
+                onRetry: _lastPickedFile == null ? null : _retryLastAnalysis,
+              ),
               data: (result) {
                 if (result == null) {
                   return Center(
@@ -124,6 +164,10 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (result.analysisSource != 'live') ...[
+                        _buildAnalysisSourceBanner(context, result.analysisSource),
+                        const SizedBox(height: AppSpacing.s16),
+                      ],
                       SeasonGradientCard(
                         subSeason: result.subSeason,
                         primarySeason: result.primarySeason,

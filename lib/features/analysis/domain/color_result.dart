@@ -46,6 +46,7 @@ class ColorResult {
   final String subSeason;
   final String primarySeason;
   final double confidence;
+  final String analysisSource;
   final String secondarySeason;
   final String explanation;
   final List<String> palette;     // 6 hex codes
@@ -75,6 +76,7 @@ class ColorResult {
     required this.subSeason,
     required this.primarySeason,
     required this.confidence,
+    required this.analysisSource,
     required this.secondarySeason,
     required this.explanation,
     required this.palette,
@@ -98,6 +100,7 @@ class ColorResult {
       subSeason: subSeason,
       primarySeason: json['primary_season'] as String,
       confidence: (json['confidence'] as num).toDouble(),
+      analysisSource: (json['analysis_source'] as String?) ?? 'live',
       secondarySeason: json['secondary_season'] as String,
       explanation: json['explanation'] as String,
       palette: List<String>.from(json['palette'] as List),

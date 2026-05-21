@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/app_states.dart';
 import 'outfit_controller.dart';
 
 class OutfitDetailScreen extends ConsumerWidget {
@@ -26,13 +27,16 @@ class OutfitDetailScreen extends ConsumerWidget {
       child: detailState.when(
         loading: () => const SizedBox(
           height: 400,
-          child: Center(child: CircularProgressIndicator()),
+          child: AppLoading(
+            title: 'Đang tải chi tiết outfit',
+            icon: Icons.checkroom_outlined,
+          ),
         ),
         error: (error, _) => Padding(
           padding: AppSpacing.pagePadding,
-          child: Text(
-            'Lỗi: ${error.toString()}',
-            textAlign: TextAlign.center,
+          child: AppErrorState(
+            message: error.toString().replaceFirst('Exception: ', ''),
+            onRetry: () => ref.refresh(outfitDetailProvider(outfitId)),
           ),
         ),
         data: (detail) => Column(
@@ -62,7 +66,7 @@ class OutfitDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.s8),
             Text(
-              'Category: ${detail.category}',
+              'Loại: ${_categoryLabel(detail.category)}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: AppSpacing.s8),
@@ -96,4 +100,14 @@ class OutfitDetailScreen extends ConsumerWidget {
     if (uri == null) return;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
+
+  String _categoryLabel(String category) => switch (category) {
+        'top' => 'Áo',
+        'bottom' => 'Quần',
+        'set' => 'Set đồ',
+        'outerwear' => 'Áo khoác',
+        'footwear' => 'Giày',
+        'accessory' => 'Phụ kiện',
+        _ => category,
+      };
 }

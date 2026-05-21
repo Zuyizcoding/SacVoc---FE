@@ -11,6 +11,8 @@ import '../../../core/widgets/app_buttons.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_states.dart';
+import '../../../core/widgets/confidence_indicator.dart';
+import '../domain/body_result.dart';
 import 'analysis_controller.dart';
 
 class BodyAnalysisScreen extends ConsumerStatefulWidget {
@@ -23,6 +25,7 @@ class BodyAnalysisScreen extends ConsumerStatefulWidget {
 class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
   bool _hasTriggeredHaptic = false;
   bool _isPicking = false;
+  File? _lastPickedFile;
 
   String _humanizeError(Object error) {
     final raw = error.toString();
@@ -45,8 +48,99 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
 
     if (file == null) return;
 
-    await ref.read(bodyAnalysisProvider.notifier).analyzeImage(File(file.path));
+    _lastPickedFile = File(file.path);
+    await ref.read(bodyAnalysisProvider.notifier).analyzeImage(_lastPickedFile!);
     if (!context.mounted) return;
+  }
+
+  Future<void> _retryLastAnalysis() async {
+    final file = _lastPickedFile;
+    if (file == null) return;
+    await ref.read(bodyAnalysisProvider.notifier).analyzeImage(file);
+  }
+
+  Widget _buildAnalysisSourceBanner(BuildContext context, String analysisSource) {
+    if (analysisSource == 'live') {
+      return const SizedBox.shrink();
+    }
+    return AppCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.wifi_tethering_error_rounded, color: Colors.orange.shade700),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Dáng người này đang được hiển thị từ chế độ dự phòng cho demo do AI quá tải. Hệ thống vẫn tiếp tục luồng trải nghiệm nhưng bạn nên hiểu đây không phải kết quả live hoàn toàn.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _qualityBandLabel(String? band) {
+    switch ((band ?? '').toLowerCase()) {
+      case 'excellent':
+        return 'Rất tốt';
+      case 'good':
+        return 'Tốt';
+      case 'usable':
+        return 'Dùng được';
+      case 'poor':
+        return 'Thấp';
+      default:
+        return 'Chưa có dữ liệu';
+    }
+  }
+
+  String _qualitySummary(BodyResult result) {
+    switch ((result.photoQualityBand ?? '').toLowerCase()) {
+      case 'excellent':
+        return 'Ảnh đầu vào rất tốt, nên kết quả thường ổn định hơn.';
+      case 'good':
+        return 'Ảnh đủ tốt để dùng tự tin trong demo và tham khảo styling.';
+      case 'usable':
+        return 'Ảnh ở mức dùng được; hệ thống vẫn phân tích best-effort và kết quả nên được xem như tham khảo tốt.';
+      case 'poor':
+        return 'Ảnh vẫn được phân tích best-effort, nhưng bạn chỉ nên chụp lại nếu muốn tăng độ chính xác.';
+      default:
+        return 'Hệ thống không ghi nhận đủ metadata chất lượng cho ảnh này.';
+    }
+  }
+
+  Widget _buildPhotoQualityCard(BuildContext context, BodyResult result) {
+    final theme = Theme.of(context);
+    final scorePercent = result.photoQualityScore == null
+        ? null
+        : (result.photoQualityScore! * 100).round();
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Chất lượng ảnh đầu vào', style: theme.textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Mức chất lượng: ${_qualityBandLabel(result.photoQualityBand)}',
+            style: theme.textTheme.bodyMedium,
+          ),
+          if (scorePercent != null) ...[
+            const SizedBox(height: AppSpacing.s4),
+            Text(
+              'Điểm heuristic: $scorePercent%',
+              style: theme.textTheme.bodyMedium,
+            ),
+          ],
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            _qualitySummary(result),
+            style: theme.textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -103,8 +197,19 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
           const SizedBox(height: AppSpacing.s24),
           Expanded(
             child: bodyState.when(
-              loading: () => const AppLoading(),
-              error: (error, _) => AppErrorState(message: _humanizeError(error)),
+              loading: () => const AppLoading(
+                title: 'AI đang phân tích dáng người',
+                icon: Icons.accessibility_new_rounded,
+                messages: [
+                  'Đang ước lượng tỷ lệ vai, eo và hông...',
+                  'Đang suy ra dáng người phù hợp nhất...',
+                  'Đang tạo gợi ý phối đồ và lưu hồ sơ dáng...',
+                ],
+              ),
+              error: (error, _) => AppErrorState(
+                message: _humanizeError(error),
+                onRetry: _lastPickedFile == null ? null : _retryLastAnalysis,
+              ),
               data: (result) {
                 if (result == null) {
                   return Center(
@@ -122,6 +227,10 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (result.analysisSource != 'live') ...[
+                        _buildAnalysisSourceBanner(context, result.analysisSource),
+                        const SizedBox(height: AppSpacing.s16),
+                      ],
                       Container(
                         decoration: BoxDecoration(
                           gradient: FigmaPalette.ctaGradient,
@@ -165,6 +274,13 @@ class _BodyAnalysisScreenState extends ConsumerState<BodyAnalysisScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: AppSpacing.s16),
+                      ConfidenceIndicator(
+                        confidence: result.confidence,
+                        label: 'Độ chắc chắn phân tích dáng',
+                      ),
+                      const SizedBox(height: AppSpacing.s16),
+                      _buildPhotoQualityCard(context, result),
                       const SizedBox(height: AppSpacing.s16),
                       AppCard(
                         child: Column(

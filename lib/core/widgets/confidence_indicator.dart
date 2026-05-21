@@ -1,13 +1,13 @@
-/// ConfidenceIndicator — Thanh hiển thị % tự tin của AI.
-///
-/// Tuân thủ:
-///   - ui-ux-design #2: 8pt grid — height 8, borderRadius 8, padding 16
-///   - ui-ux-design #3: Nền #FAFAFA, bóng mềm
-///   - ui-ux-design #4: Typography phân cấp
-///   - SHOULD S3: Xanh (≥80%) / Vàng (60-79%) / Đỏ (<60%)
-///
-/// Sử dụng:
-///   ConfidenceIndicator(confidence: 0.87, label: 'Độ tự tin')
+// ConfidenceIndicator — Thanh hiển thị % tự tin của AI.
+//
+// Tuân thủ:
+//   - ui-ux-design #2: 8pt grid — height 8, borderRadius 8, padding 16
+//   - ui-ux-design #3: Nền #FAFAFA, bóng mềm
+//   - ui-ux-design #4: Typography phân cấp
+//   - SHOULD S3: Xanh / Vàng / Đỏ theo mức confidence
+//
+// Sử dụng:
+//   ConfidenceIndicator(confidence: 0.87, label: 'Độ tự tin')
 import 'package:flutter/material.dart';
 
 import '../theme/figma_palette.dart';
@@ -134,20 +134,23 @@ class ConfidenceIndicator extends StatelessWidget {
     );
   }
 
-  /// Màu theo mức confidence (SHOULD S3)
-  ///   ≥ 80% → Xanh lá (kết quả đáng tin cậy)
-  ///   60-79% → Vàng cam (khá chắc)
-  ///   < 60% → Đỏ (ảnh kém, cần chụp lại)
+  /// Màu theo mức confidence cho demo:
+  ///   ≥ 80% → Xanh lá (đáng tin cậy)
+  ///   45-79% → Vàng cam (best-effort / tham khảo tốt)
+  ///   < 45% → Đỏ (độ chắc chắn thấp)
   Color _getColor() {
     if (confidence >= 0.8) return FigmaPalette.success;
-    if (confidence >= 0.6) return FigmaPalette.warning;
+    if (confidence >= 0.45) return FigmaPalette.warning;
     return FigmaPalette.danger;
   }
 
   /// Mô tả tiếng Việt theo mức confidence
   String _getDescription(int percentage) {
     if (confidence >= 0.8) return 'Kết quả đáng tin cậy ✓';
-    if (confidence >= 0.6) return 'Kết quả tham khảo — chụp ảnh rõ hơn sẽ chính xác hơn';
-    return 'Ảnh chưa đủ rõ — hãy chụp lại với ánh sáng tốt hơn';
+    if (confidence >= 0.6) return 'Kết quả tham khảo tốt cho demo — ảnh rõ hơn sẽ giúp chắc chắn hơn';
+    if (confidence >= 0.45) {
+      return 'Kết quả best-effort vẫn dùng được để tham khảo, chưa cần chụp lại ngay';
+    }
+    return 'Độ chắc chắn còn thấp — chỉ nên chụp lại nếu bạn cần kết quả chính xác hơn';
   }
 }
