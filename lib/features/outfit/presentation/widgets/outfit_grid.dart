@@ -58,14 +58,9 @@ class OutfitGrid extends ConsumerWidget {
     final outfits = result.outfits;
     return ListView.separated(
       padding: AppSpacing.pagePadding,
-      itemCount: outfits.length + 1,
+      itemCount: outfits.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s16),
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return _OutfitContextCard(result: result, history: history);
-        }
-        return _OutfitListItem(outfit: outfits[index - 1]);
-      },
+      itemBuilder: (context, index) => _OutfitListItem(outfit: outfits[index]),
     );
   }
 
@@ -290,62 +285,3 @@ class _OutfitListItem extends StatelessWidget {
       };
 }
 
-class _OutfitContextCard extends StatelessWidget {
-  final OutfitResult result;
-  final AnalysisHistoryResult? history;
-
-  const _OutfitContextCard({
-    required this.result,
-    required this.history,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = history?.color;
-    final body = history?.body;
-    final degraded = (color?.analysisSource != null && color!.analysisSource != 'live') ||
-        (body?.analysisSource != null && body!.analysisSource != 'live');
-
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Vì sao hệ thống gợi ý như vậy', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: AppSpacing.s8),
-          Text(
-            'Dựa trên ${color?.subSeason ?? 'màu sắc'} + ${body?.shape ?? 'dáng người'} + dịp hằng ngày.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: AppSpacing.s4),
-          Text(
-            'Truy vấn F3: ${result.queryUsed}',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          if (result.querySource != null) ...[
-            const SizedBox(height: AppSpacing.s4),
-            Text(
-              'Nguồn vector: ${_querySourceLabel(result.querySource!)}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-          if (degraded) ...[
-            const SizedBox(height: 12),
-            Text(
-              'Lưu ý: một phần tín hiệu F1/F2 đang ở chế độ dự phòng cho demo, nên đây là gợi ý cá nhân hóa best-effort.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.orange.shade800,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  String _querySourceLabel(String source) => switch (source) {
-        'precomputed_query_vector' => 'precomputed demo vectors',
-        'injected_encoder' => 'test/injected encoder',
-        _ => source.replaceAll('_', ' '),
-      };
-}

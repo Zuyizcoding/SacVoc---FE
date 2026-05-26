@@ -177,18 +177,24 @@ class HomeScreen extends ConsumerWidget {
     final hasBody = history?.body != null;
     final isOutfitReady = hasColor && hasBody;
     final nextLabel = !hasColor
-        ? 'Bắt đầu bước 1'
+        ? 'Bắt đầu phân tích màu sắc'
         : !hasBody
-            ? 'Tiếp tục bước 2'
-            : 'Sang bước 3';
+            ? 'Tiếp tục phân tích dáng người'
+            : 'Xem gợi ý trang phục';
     final nextRoute = !hasColor
         ? '/color'
         : !hasBody
             ? '/body'
             : '/outfit';
+    final overview = !hasColor && !hasBody
+        ? 'Bắt đầu với ảnh khuôn mặt và ảnh toàn thân để cá nhân hóa gợi ý trang phục.'
+        : isOutfitReady
+            ? 'Hồ sơ của bạn đã đủ dữ liệu để xem gợi ý trang phục phù hợp.'
+            : 'Bạn đã có một phần hồ sơ. Hoàn thiện bước còn lại để nhận gợi ý trang phục tốt hơn.';
 
     return AppScaffold(
       appBar: AppBar(title: const Text('Sắc Vóc')),
+      scroll: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -197,45 +203,45 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Demo journey 3 bước',
+                  'Hồ sơ phong cách',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: AppSpacing.s8),
                 Text(
-                  'Đi từ phân tích màu sắc và dáng người sang gợi ý outfit local có thể mua thật.',
+                  overview,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: AppSpacing.s16),
-                _DemoJourneyStepCard(
-                  stepNumber: 1,
+                _ProfileSummaryRow(
+                  icon: Icons.palette_outlined,
                   title: 'Màu sắc cá nhân',
                   subtitle: hasColor
                       ? 'Đã có kết quả màu sắc trong hồ sơ.'
                       : 'Chụp selfie rõ mặt để xác định mùa sắc.',
-                  status: hasColor ? 'Hoàn tất' : 'Chưa làm',
-                  isDone: hasColor,
+                  status: hasColor ? 'Đã lưu' : 'Chưa có',
+                  isReady: hasColor,
                   onPressed: () => context.push('/color'),
                 ),
                 const SizedBox(height: 12),
-                _DemoJourneyStepCard(
-                  stepNumber: 2,
+                _ProfileSummaryRow(
+                  icon: Icons.accessibility_new_outlined,
                   title: 'Dáng người',
                   subtitle: hasBody
                       ? 'Đã có kết quả dáng người trong hồ sơ.'
                       : 'Chụp ảnh toàn thân để hệ thống suy ra form phù hợp.',
-                  status: hasBody ? 'Hoàn tất' : 'Chưa làm',
-                  isDone: hasBody,
+                  status: hasBody ? 'Đã lưu' : 'Chưa có',
+                  isReady: hasBody,
                   onPressed: () => context.push('/body'),
                 ),
                 const SizedBox(height: 12),
-                _DemoJourneyStepCard(
-                  stepNumber: 3,
+                _ProfileSummaryRow(
+                  icon: Icons.checkroom_outlined,
                   title: 'Gợi ý outfit',
                   subtitle: isOutfitReady
-                      ? 'Sẵn sàng tạo outfit cá nhân hóa cho phần demo.'
-                      : 'Mở khóa sau khi hoàn thành cả F1 và F2.',
-                  status: isOutfitReady ? 'Sẵn sàng' : 'Đang chờ dữ liệu',
-                  isDone: isOutfitReady,
+                      ? 'Có thể xem ngay các outfit được cá nhân hóa theo hồ sơ.'
+                      : 'Hoàn thiện màu sắc và dáng người để mở gợi ý chính xác hơn.',
+                  status: isOutfitReady ? 'Sẵn sàng' : 'Cần bổ sung hồ sơ',
+                  isReady: isOutfitReady,
                   onPressed: () => context.push('/outfit'),
                 ),
                 const SizedBox(height: AppSpacing.s16),
@@ -248,29 +254,46 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.s16),
-          AppPrimaryButton(
-            label: 'Phân tích màu sắc',
-            onPressed: () => context.push('/color'),
-          ),
-          const SizedBox(height: AppSpacing.s16),
-          AppPrimaryButton(
-            label: 'Phân tích dáng người',
-            onPressed: () => context.push('/body'),
-          ),
-          const SizedBox(height: AppSpacing.s16),
-          AppPrimaryButton(
-            label: 'Gợi ý trang phục',
-            onPressed: () => context.push('/outfit'),
-          ),
-          const SizedBox(height: AppSpacing.s16),
           AppSecondaryButton(
             label: 'Xem lại kết quả',
             onPressed: () => context.push('/history'),
           ),
+          const SizedBox(height: AppSpacing.s16),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tác vụ nhanh',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: AppSpacing.s8),
+                Text(
+                  'Bạn có thể cập nhật từng phần hồ sơ bất cứ lúc nào.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.s16),
+                AppSecondaryButton(
+                  label: 'Phân tích màu sắc',
+                  onPressed: () => context.push('/color'),
+                ),
+                const SizedBox(height: 12),
+                AppSecondaryButton(
+                  label: 'Phân tích dáng người',
+                  onPressed: () => context.push('/body'),
+                ),
+                const SizedBox(height: 12),
+                AppSecondaryButton(
+                  label: 'Gợi ý trang phục',
+                  onPressed: isOutfitReady ? () => context.push('/outfit') : null,
+                ),
+              ],
+            ),
+          ),
           if (historyState.isLoading) ...[
             const SizedBox(height: 12),
             Text(
-              'Đang đồng bộ trạng thái hành trình demo...',
+              'Đang cập nhật hồ sơ của bạn...',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),
@@ -281,20 +304,20 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _DemoJourneyStepCard extends StatelessWidget {
-  final int stepNumber;
+class _ProfileSummaryRow extends StatelessWidget {
+  final IconData icon;
   final String title;
   final String subtitle;
   final String status;
-  final bool isDone;
+  final bool isReady;
   final VoidCallback onPressed;
 
-  const _DemoJourneyStepCard({
-    required this.stepNumber,
+  const _ProfileSummaryRow({
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.status,
-    required this.isDone,
+    required this.isReady,
     required this.onPressed,
   });
 
@@ -306,7 +329,7 @@ class _DemoJourneyStepCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadii.r16),
         border: Border.all(
-          color: isDone ? colorScheme.primary.withValues(alpha: 0.25) : Colors.grey.shade300,
+          color: isReady ? colorScheme.primary.withValues(alpha: 0.25) : Colors.grey.shade300,
         ),
       ),
       child: Row(
@@ -314,15 +337,13 @@ class _DemoJourneyStepCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: isDone
+            backgroundColor: isReady
                 ? colorScheme.primary.withValues(alpha: 0.12)
                 : Colors.grey.shade200,
-            child: Text(
-              '$stepNumber',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: isDone ? colorScheme.primary : Colors.black87,
-                    fontWeight: FontWeight.w700,
-                  ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: isReady ? colorScheme.primary : Colors.black54,
             ),
           ),
           const SizedBox(width: 12),
@@ -337,7 +358,7 @@ class _DemoJourneyStepCard extends StatelessWidget {
                 Text(
                   status,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: isDone ? colorScheme.primary : Colors.black54,
+                        color: isReady ? colorScheme.primary : Colors.black54,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
