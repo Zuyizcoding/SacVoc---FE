@@ -41,3 +41,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android Gradle cache
+android/.gradle/
+
+# Platform không dùng (demo Android only)
+windows.__disabled_for_android__/
+
+# Markdown: chỉ giữ README gốc
+*.md
+!/README.md
