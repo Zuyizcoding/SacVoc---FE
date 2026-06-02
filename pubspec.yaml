@@ -32,6 +32,7 @@ dependencies:
 
   # --- Utilities ---
   url_launcher: ^6.2.5           # Mở link Shopee trong trình duyệt
+  crypto: ^3.0.3                 # SHA256 device_id header
 
 dev_dependencies:
   flutter_test:
