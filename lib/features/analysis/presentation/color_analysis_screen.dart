@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,21 +7,18 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/widgets/app_buttons.dart';
-import '../../../core/widgets/advice_summary_card.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_states.dart';
-import '../../../core/widgets/color_palette_row.dart';
-import '../../../core/widgets/confidence_indicator.dart';
-import '../../../core/widgets/menswear_guidance_card.dart';
-import '../../../core/widgets/season_gradient_card.dart';
 import 'analysis_controller.dart';
+import 'widgets/color_result_view.dart';
 
 class ColorAnalysisScreen extends ConsumerStatefulWidget {
   const ColorAnalysisScreen({super.key});
 
   @override
-  ConsumerState<ColorAnalysisScreen> createState() => _ColorAnalysisScreenState();
+  ConsumerState<ColorAnalysisScreen> createState() =>
+      _ColorAnalysisScreenState();
 }
 
 class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
@@ -51,7 +48,9 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
     if (file == null) return;
 
     _lastPickedFile = File(file.path);
-    await ref.read(colorAnalysisProvider.notifier).analyzeImage(_lastPickedFile!);
+    await ref
+        .read(colorAnalysisProvider.notifier)
+        .analyzeImage(_lastPickedFile!);
     if (!context.mounted) return;
   }
 
@@ -59,27 +58,6 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
     final file = _lastPickedFile;
     if (file == null) return;
     await ref.read(colorAnalysisProvider.notifier).analyzeImage(file);
-  }
-
-  Widget _buildAnalysisSourceBanner(BuildContext context, String analysisSource) {
-    if (analysisSource == 'live') {
-      return const SizedBox.shrink();
-    }
-    return AppCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.wifi_tethering_error_rounded, color: Colors.orange.shade700),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Kết quả này đang dùng chế độ dự phòng cho demo vì AI tạm thời quá tải. Hãy xem đây là mẫu tham khảo minh họa thay vì phân tích live hoàn toàn.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -106,20 +84,25 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
           AppPrimaryButton(
             label: 'Chụp ảnh',
             icon: Icons.camera_alt_outlined,
-            onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.camera),
+            onPressed: isBusy
+                ? null
+                : () => _pickAndAnalyze(context, ref, ImageSource.camera),
           ),
           const SizedBox(height: AppSpacing.s16),
           AppSecondaryButton(
             label: 'Chọn ảnh',
             icon: Icons.photo_library_outlined,
-            onPressed: isBusy ? null : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
+            onPressed: isBusy
+                ? null
+                : () => _pickAndAnalyze(context, ref, ImageSource.gallery),
           ),
           const SizedBox(height: AppSpacing.s8),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Ảnh phù hợp cho F1', style: Theme.of(context).textTheme.titleMedium),
+                Text('Ảnh phù hợp cho F1',
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.s8),
                 Text(
                   'Ưu tiên selfie gần, thấy rõ khuôn mặt và vùng cổ, ánh sáng đều.',
@@ -161,58 +144,12 @@ class _ColorAnalysisScreenState extends ConsumerState<ColorAnalysisScreen> {
                 }
 
                 return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (result.analysisSource != 'live') ...[
-                        _buildAnalysisSourceBanner(context, result.analysisSource),
-                        const SizedBox(height: AppSpacing.s16),
-                      ],
-                      SeasonGradientCard(
-                        subSeason: result.subSeason,
-                        primarySeason: result.primarySeason,
-                        confidence: result.confidence,
-                        explanation: result.explanation,
-                        gradientFrom: _hexToColor(result.gradientFrom),
-                        gradientTo: _hexToColor(result.gradientTo),
-                      ),
-                      const SizedBox(height: AppSpacing.s16),
-                      ConfidenceIndicator(confidence: result.confidence),
-                      const SizedBox(height: AppSpacing.s16),
-                      AppCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Bảng màu cá nhân', style: Theme.of(context).textTheme.titleMedium),
-                            const SizedBox(height: AppSpacing.s16),
-                            ColorPaletteRow(hexColors: result.palette),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.s16),
-                      AdviceSummaryCard(
-                        title: 'Tóm tắt nhanh',
-                        advice: result.advice,
-                      ),
-                      if (result.menswear != null) ...[
-                        const SizedBox(height: AppSpacing.s16),
-                        MenswearGuidanceCard(guidance: result.menswear!),
-                      ],
-                    ],
-                  ),
-                );
+                    child: ColorResultView(result: result));
               },
             ),
           ),
         ],
       ),
     );
-  }
-
-  Color _hexToColor(String hex) {
-    final buffer = StringBuffer();
-    if (hex.length == 6 || hex.length == 7) buffer.write('FF');
-    buffer.write(hex.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
   }
 }

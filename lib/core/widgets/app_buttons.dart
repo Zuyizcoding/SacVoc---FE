@@ -55,7 +55,8 @@ class AppPrimaryButton extends StatelessWidget {
               onTap: onPressed,
               child: Center(
                 child: DefaultTextStyle(
-                  style: theme.textTheme.titleMedium!.copyWith(color: foreground),
+                  style:
+                      theme.textTheme.titleMedium!.copyWith(color: foreground),
                   child: IconTheme(
                     data: IconThemeData(color: foreground),
                     child: content,

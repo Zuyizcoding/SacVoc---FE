@@ -46,7 +46,8 @@ class _AppLoadingState extends State<AppLoading> {
 
   @override
   Widget build(BuildContext context) {
-    final activeMessage = widget.messages.isEmpty ? null : widget.messages[_messageIndex];
+    final activeMessage =
+        widget.messages.isEmpty ? null : widget.messages[_messageIndex];
     if (widget.title == null && activeMessage == null && widget.icon == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -58,7 +59,8 @@ class _AppLoadingState extends State<AppLoading> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget.icon != null) ...[
-              Icon(widget.icon, size: 40, color: Theme.of(context).colorScheme.primary),
+              Icon(widget.icon,
+                  size: 40, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: AppSpacing.s16),
             ],
             const CircularProgressIndicator(),

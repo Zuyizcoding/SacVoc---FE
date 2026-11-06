@@ -1,8 +1,4 @@
-/// Dio HTTP Client với Device ID header (Tính năng #3).
-///
-/// Tuân thủ:
-///   - mobile-flutter #3: Repository Pattern — Dio là infrastructure, không phải UI
-///   - Tính năng #3: Anonymous Identity — SHA256 device ID trong mọi request
+//
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -25,7 +21,6 @@ final dioProvider = Provider<Dio>((ref) {
     ),
   );
 
-  // Interceptor: inject Device ID vào mọi request (Tính năng #3)
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -42,7 +37,6 @@ final dioProvider = Provider<Dio>((ref) {
 /// Lấy hoặc tạo Device ID (SHA256) — lưu SharedPreferences.
 ///
 /// Flow: device_info_plus → SHA256 → SharedPreferences → header mọi request.
-/// Không cần tạo tài khoản — anonymous identity (Tính năng #3).
 Future<String> _getOrCreateDeviceId() async {
   final prefs = await SharedPreferences.getInstance();
   final cached = prefs.getString('device_id');

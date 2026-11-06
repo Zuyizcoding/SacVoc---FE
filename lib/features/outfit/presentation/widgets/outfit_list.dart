@@ -1,10 +1,5 @@
-/// OutfitGrid — Lưới 6 outfit (2 cột × 3 hàng).
-///
-/// Tuân thủ:
-///   - ui-ux-design #2: 8pt grid — spacing 16, borderRadius 16
-///   - ui-ux-design #3: Bóng đổ mềm, nền #FAFAFA
-///   - Tính năng #31: Hiển thị 6 outfit
-///   - Tính năng #33: Nhấn vào → chi tiết + nút Shopee
+// Danh sách gợi ý outfit một cột.
+//
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,19 +8,15 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/widgets/app_buttons.dart';
 import '../../../../core/widgets/app_card.dart';
-import '../../../analysis/domain/analysis_history_result.dart';
-import '../../../analysis/presentation/analysis_controller.dart';
-import '../outfit_controller.dart';
 import '../../domain/outfit_result.dart';
+import '../outfit_controller.dart';
 
-
-class OutfitGrid extends ConsumerWidget {
-  const OutfitGrid({super.key});
+class OutfitList extends ConsumerWidget {
+  const OutfitList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final outfitState = ref.watch(outfitControllerProvider);
-    final history = ref.watch(analysisHistoryProvider).asData?.value;
 
     return outfitState.when(
       // ─── Loading: Placeholder list ───
@@ -44,16 +35,14 @@ class OutfitGrid extends ConsumerWidget {
             child: Text('Chưa có dữ liệu trang phục. Vui lòng thử lại sau.'),
           );
         }
-        return _buildList(context, result, history);
+        return _buildList(result);
       },
     );
   }
 
   /// List 1 cột — đúng yêu cầu port Figma
   Widget _buildList(
-    BuildContext context,
     OutfitResult result,
-    AnalysisHistoryResult? history,
   ) {
     final outfits = result.outfits;
     return ListView.separated(
@@ -77,7 +66,7 @@ class OutfitGrid extends ConsumerWidget {
               height: 112,
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(AppRadii.r16),
+                borderRadius: BorderRadius.circular(AppRadii.lg),
               ),
             ),
             const SizedBox(width: AppSpacing.s16),
@@ -87,9 +76,11 @@ class OutfitGrid extends ConsumerWidget {
                 children: [
                   Container(height: 14, color: Colors.grey.shade200),
                   const SizedBox(height: AppSpacing.s8),
-                  Container(height: 14, width: 180, color: Colors.grey.shade200),
+                  Container(
+                      height: 14, width: 180, color: Colors.grey.shade200),
                   const SizedBox(height: AppSpacing.s16),
-                  Container(height: 12, width: 120, color: Colors.grey.shade200),
+                  Container(
+                      height: 12, width: 120, color: Colors.grey.shade200),
                 ],
               ),
             ),
@@ -99,7 +90,6 @@ class OutfitGrid extends ConsumerWidget {
     );
   }
 
-  /// Error state — phân biệt MissingAnalysisException (Tính năng #15)
   Widget _buildErrorState(BuildContext context, WidgetRef ref, Object error) {
     // Import MissingAnalysisException từ outfit_repository.dart
     final message = error.toString();
@@ -122,7 +112,9 @@ class OutfitGrid extends ConsumerWidget {
               AppSecondaryButton(
                 label: 'Thử lại',
                 onPressed: () {
-                  ref.read(outfitControllerProvider.notifier).loadRecommendations();
+                  ref
+                      .read(outfitControllerProvider.notifier)
+                      .loadRecommendations();
                 },
               ),
             ],
@@ -152,8 +144,9 @@ class OutfitGrid extends ConsumerWidget {
               icon: const Icon(Icons.auto_awesome),
               label: const Text('Xem gợi ý'),
               onPressed: () {
-                ref.read(outfitControllerProvider.notifier)
-                   .loadRecommendations();
+                ref
+                    .read(outfitControllerProvider.notifier)
+                    .loadRecommendations();
               },
             ),
           ],
@@ -171,14 +164,14 @@ class _OutfitListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(AppRadii.r16),
+      borderRadius: BorderRadius.circular(AppRadii.lg),
       onTap: () => context.push('/outfit/${outfit.id}'),
       child: AppCard(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadii.r16),
+              borderRadius: BorderRadius.circular(AppRadii.lg),
               child: CachedNetworkImage(
                 imageUrl: outfit.imageUrl,
                 width: 88,
@@ -228,7 +221,8 @@ class _OutfitListItem extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(AppRadii.r8),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadii.md),
                               ),
                               child: Text(
                                 _reasonLabel(tag),
@@ -250,7 +244,7 @@ class _OutfitListItem extends StatelessWidget {
                           .colorScheme
                           .primary
                           .withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(AppRadii.r8),
+                      borderRadius: BorderRadius.circular(AppRadii.md),
                     ),
                     child: Text(
                       'Match ${(outfit.score * 100).toInt()}%',
@@ -284,4 +278,3 @@ class _OutfitListItem extends StatelessWidget {
         _ => tag.replaceAll('_', ' '),
       };
 }
-

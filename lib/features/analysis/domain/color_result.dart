@@ -1,6 +1,5 @@
 /// Model kết quả phân tích màu sắc — Immutable.
 ///
-/// Tuân thủ: mobile-flutter #1 — domain/ chứa Entity classes.
 /// Map 1:1 với ColorApiResponse trên backend.
 class MakeupGuide {
   final List<String> lip;
@@ -49,14 +48,13 @@ class ColorResult {
   final String analysisSource;
   final String secondarySeason;
   final String explanation;
-  final List<String> palette;     // 6 hex codes
+  final List<String> palette; // 6 hex codes
   final MakeupGuide makeup;
   final String advice;
   final MenswearGuide? menswear;
   final String gradientFrom;
   final String gradientTo;
 
-  // Hardcode map theo ENHANCED `season_data.py` (Playbook 6.5 - Cách 1)
   static const Map<String, Map<String, String>> _seasonGradientMap = {
     'Light Spring': {'gradient_from': '#FFD6A5', 'gradient_to': '#FFAFCC'},
     'True Spring': {'gradient_from': '#FFD6A5', 'gradient_to': '#FFAFCC'},

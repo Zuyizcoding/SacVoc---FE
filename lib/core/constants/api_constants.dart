@@ -1,16 +1,19 @@
 /// Hằng số API — endpoint base URL và paths.
 ///
-/// Tuân thủ: mobile-flutter #3 — tập trung URL, không hard-code trong Repository.
 class ApiConstants {
   ApiConstants._(); // Không cho phép tạo instance
 
-  /// Base URL — đổi khi deploy lên Railway
-  static const String baseUrl = 'http://10.0.2.2:8000'; // Android emulator → localhost
+  /// Truyền --dart-define=API_BASE_URL=... khi dùng thiết bị thật hoặc server khác.
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.0.2.2:8000',
+  );
 
   /// Endpoints
   static const String analyzeColor = '/api/v1/analyze/color';
   static const String analyzeBody = '/api/v1/analyze/body';
   static const String analyzeHistory = '/api/v1/analyze/history';
   static const String outfitRecommend = '/api/v1/outfits/recommend';
+  static String outfitDetail(int id) => '/api/v1/outfits/$id';
   static const String health = '/health';
 }

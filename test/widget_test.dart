@@ -9,11 +9,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sac_voc/main.dart';
+import 'package:sac_voc/features/analysis/domain/analysis_history_result.dart';
+import 'package:sac_voc/features/analysis/presentation/analysis_controller.dart';
+
+class EmptyHistoryController extends AnalysisHistoryController {
+  @override
+  Future<AnalysisHistoryResult?> build() async =>
+      const AnalysisHistoryResult(color: null, body: null);
+}
 
 void main() {
   testWidgets('App boots smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const ProviderScope(child: SacVocApp()),
+      ProviderScope(
+        overrides: [
+          analysisHistoryProvider.overrideWith(EmptyHistoryController.new)
+        ],
+        child: const SacVocApp(),
+      ),
     );
 
     // SplashScreen schedules a delayed navigation after 2 seconds.

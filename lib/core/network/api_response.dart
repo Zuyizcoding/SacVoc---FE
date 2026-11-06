@@ -1,11 +1,9 @@
-/// Wrapper response chuẩn — map 1:1 với ApiResponse<T> trên backend.
-///
-/// Tuân thủ: mobile-flutter #1 — domain/ chứa Immutable classes.
+/// Envelope API; đọc được cả mã lỗi chuỗi hiện tại và mã số của payload cũ.
 class ApiResponse<T> {
   final bool success;
   final T? data;
   final String? error;
-  final int? errorCode;
+  final String? errorCode;
 
   const ApiResponse({
     required this.success,
@@ -24,7 +22,7 @@ class ApiResponse<T> {
           ? fromJsonT(json['data'] as Map<String, dynamic>)
           : null,
       error: json['error'] as String?,
-      errorCode: json['error_code'] as int?,
+      errorCode: json['error_code']?.toString(),
     );
   }
 }

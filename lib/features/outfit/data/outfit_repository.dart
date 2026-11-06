@@ -1,13 +1,14 @@
-﻿/// Outfit Repository - call F3 API and parse response.
-///
-/// Conventions:
-///   - mobile-flutter #2: Abstract class + Implementation
-///   - mobile-flutter #3: Repository Pattern - separate data layer
-///   - Feature #15: F1+F2 -> F3 flow - handle "not analyzed yet" cases
 import 'package:dio/dio.dart';
+
+import '../../../core/constants/api_constants.dart';
+import '../../../core/network/api_error_details.dart';
 import '../../../core/network/api_response.dart';
 import '../domain/outfit_result.dart';
 
+/// Outfit Repository - call F3 API and parse response.
+///
+/// Conventions:
+///   - Feature #15: F1+F2 -> F3 flow - handle "not analyzed yet" cases
 
 /// Interface - easy to mock in tests
 abstract class OutfitRepository {
@@ -20,7 +21,6 @@ abstract class OutfitRepository {
   /// Load details for a single outfit.
   Future<OutfitDetail> getOutfitDetail(int outfitId);
 }
-
 
 /// Production implementation backed by the API.
 class OutfitRepositoryImpl implements OutfitRepository {
@@ -35,7 +35,7 @@ class OutfitRepositoryImpl implements OutfitRepository {
   }) async {
     try {
       final response = await _dio.get(
-        '/api/v1/outfits/recommend',
+        ApiConstants.outfitRecommend,
         queryParameters: {
           'occasion': occasion,
           'gender': gender,
@@ -61,7 +61,7 @@ class OutfitRepositoryImpl implements OutfitRepository {
   Future<OutfitDetail> getOutfitDetail(int outfitId) async {
     try {
       final response = await _dio.get(
-        '/api/v1/outfits/$outfitId',
+        ApiConstants.outfitDetail(outfitId),
       );
 
       final apiResponse = ApiResponse.fromJson(
@@ -83,11 +83,13 @@ class OutfitRepositoryImpl implements OutfitRepository {
   /// Feature #34: centralized error handling.
   Exception _mapDioError(DioException e) {
     final statusCode = e.response?.statusCode;
-    final detail = e.response?.data?['detail'];
+    final body = e.response?.data;
+    final detail = body is Map ? body['detail'] : null;
+    final error = ApiErrorDetails.fromException(e);
 
     // F1 + F2 not completed yet.
     if (statusCode == 400 && detail is Map) {
-      final message = detail['message'] as String? ?? '';
+      final message = error.message ?? '';
       final missing = detail['missing'] as List? ?? [];
 
       if (missing.contains('color') && missing.contains('body')) {
@@ -124,7 +126,6 @@ class OutfitRepositoryImpl implements OutfitRepository {
   }
 }
 
-
 /// Special exception so the UI can guide users back to F1/F2 first.
 class MissingAnalysisException implements Exception {
   final String message;
@@ -140,4 +141,3 @@ class MissingAnalysisException implements Exception {
   @override
   String toString() => message;
 }
-

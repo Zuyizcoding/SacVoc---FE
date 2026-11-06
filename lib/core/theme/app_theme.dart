@@ -27,10 +27,10 @@ class AppTheme {
   static const double spacing40 = AppSpacing.s40;
   static const double spacing48 = AppSpacing.s48;
 
-  static const double radiusSmall = AppRadii.r8;
-  static const double radiusMedium = AppRadii.r16;
-  static const double radiusLarge = AppRadii.r24;
-  static const double radiusXL = AppRadii.r32;
+  static const double radiusSmall = AppRadii.md;
+  static const double radiusMedium = AppRadii.lg;
+  static const double radiusLarge = AppRadii.xl;
+  static const double radiusXL = AppRadii.xl;
 
   static List<BoxShadow> get cardShadow => [
         BoxShadow(
@@ -144,15 +144,15 @@ class AppTheme {
         filled: true,
         fillColor: AppColors.inputBackground,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.r16),
+          borderRadius: BorderRadius.circular(AppRadii.lg),
           borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.r16),
+          borderRadius: BorderRadius.circular(AppRadii.lg),
           borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.r16),
+          borderRadius: BorderRadius.circular(AppRadii.lg),
           borderSide: BorderSide(color: AppColors.ring, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(

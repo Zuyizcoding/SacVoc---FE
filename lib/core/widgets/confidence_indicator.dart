@@ -1,10 +1,5 @@
 // ConfidenceIndicator — Thanh hiển thị % tự tin của AI.
 //
-// Tuân thủ:
-//   - ui-ux-design #2: 8pt grid — height 8, borderRadius 8, padding 16
-//   - ui-ux-design #3: Nền #FAFAFA, bóng mềm
-//   - ui-ux-design #4: Typography phân cấp
-//   - SHOULD S3: Xanh / Vàng / Đỏ theo mức confidence
 //
 // Sử dụng:
 //   ConfidenceIndicator(confidence: 0.87, label: 'Độ tự tin')
@@ -42,11 +37,10 @@ class ConfidenceIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(16), // bội 8
-        // Bóng đổ mềm — opacity thấp (ui-ux-design #3)
         boxShadow: [
           BoxShadow(
             color: FigmaPalette.shadowColor.withValues(alpha: 0.16),
-            blurRadius: 16,              // bội 8
+            blurRadius: 16, // bội 8
             offset: const Offset(0, 4),
           ),
         ],
@@ -58,7 +52,6 @@ class ConfidenceIndicator extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Label (Body — Regular | ui-ux-design #4)
               Text(
                 label,
                 style: TextStyle(
@@ -67,7 +60,6 @@ class ConfidenceIndicator extends StatelessWidget {
                   color: scheme.onSurface.withValues(alpha: 0.70),
                 ),
               ),
-              // Percentage (Heading — SemiBold | ui-ux-design #4)
               if (showPercentage)
                 Text(
                   '$percentage%',
@@ -88,7 +80,7 @@ class ConfidenceIndicator extends StatelessWidget {
               children: [
                 // Background track
                 Container(
-                  height: 8,   // bội 8
+                  height: 8, // bội 8
                   width: double.infinity,
                   color: backgroundColor,
                 ),
@@ -96,7 +88,7 @@ class ConfidenceIndicator extends StatelessWidget {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 800),
                   curve: Curves.easeOutCubic,
-                  height: 8,  // bội 8
+                  height: 8, // bội 8
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   child: FractionallySizedBox(
@@ -120,7 +112,6 @@ class ConfidenceIndicator extends StatelessWidget {
           ),
           const SizedBox(height: 8), // bội 8
 
-          // ─── Description text (Caption — Light | ui-ux-design #4) ───
           Text(
             _getDescription(percentage),
             style: TextStyle(
@@ -137,7 +128,7 @@ class ConfidenceIndicator extends StatelessWidget {
   /// Màu theo mức confidence cho demo:
   ///   ≥ 80% → Xanh lá (đáng tin cậy)
   ///   45-79% → Vàng cam (best-effort / tham khảo tốt)
-  ///   < 45% → Đỏ (độ chắc chắn thấp)
+  //   < 45% → Đỏ (độ chắc chắn thấp)
   Color _getColor() {
     if (confidence >= 0.8) return FigmaPalette.success;
     if (confidence >= 0.45) return FigmaPalette.warning;
@@ -147,7 +138,9 @@ class ConfidenceIndicator extends StatelessWidget {
   /// Mô tả tiếng Việt theo mức confidence
   String _getDescription(int percentage) {
     if (confidence >= 0.8) return 'Kết quả đáng tin cậy ✓';
-    if (confidence >= 0.6) return 'Kết quả tham khảo tốt cho demo — ảnh rõ hơn sẽ giúp chắc chắn hơn';
+    if (confidence >= 0.6) {
+      return 'Kết quả tham khảo tốt cho demo — ảnh rõ hơn sẽ giúp chắc chắn hơn';
+    }
     if (confidence >= 0.45) {
       return 'Kết quả best-effort vẫn dùng được để tham khảo, chưa cần chụp lại ngay';
     }

@@ -10,7 +10,7 @@
 | HTTP | Dio |
 | Device ID | `device_info_plus` + SHA256 → header `X-Device-ID` |
 
-Repo backend: [`CS4153.Q24.CTTT---BE`](../CS4153.Q24.CTTT---BE).
+Repo backend: [`SacVoc---BE`](../SacVoc---BE).
 
 ---
 
@@ -55,13 +55,13 @@ Clean Architecture nhẹ: `domain` / `data` (repository) / `presentation` (scree
 ### 1. Cài dependency
 
 ```bash
-cd CS4153.Q24.CTTT---FE
+cd SacVoc---FE
 flutter pub get
 ```
 
 ### 2. Cấu hình API
 
-Sửa `lib/core/constants/api_constants.dart`:
+Truyền URL qua `flutter run --dart-define=API_BASE_URL=<url>`. Giá trị mặc định vẫn là URL Android emulator:
 
 | Môi trường | `baseUrl` gợi ý |
 |------------|----------------|
@@ -71,11 +71,11 @@ Sửa `lib/core/constants/api_constants.dart`:
 
 ### 3. Chạy backend trước
 
-Xem hướng dẫn trong [README backend](../CS4153.Q24.CTTT---BE/README.md).
+Xem hướng dẫn trong [README backend](../SacVoc---BE/README.md).
 
 ```bash
 # Ví dụ
-cd ../CS4153.Q24.CTTT---BE
+cd ../SacVoc---BE
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -141,3 +141,7 @@ flutter test
 ## License / nhóm
 
 Dự án môn học **CS4153** — UIT. Liên hệ nhóm phát triển qua repository Git của course.
+
+## Dành cho người mới
+
+Đọc [onboarding và khái niệm Flutter/Riverpod](docs/onboarding.md), rồi làm theo [setup/tests/build](docs/development.md). SDK kiểm chứng với lockfile hiện tại: Flutter 3.41.5 / Dart 3.11.3. Dùng `flutter pub get --enforce-lockfile`. Các view kết quả dùng chung ở `lib/features/analysis/presentation/widgets/`; home và splash ở feature `home`.

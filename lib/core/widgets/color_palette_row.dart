@@ -1,14 +1,10 @@
-/// ColorPaletteRow — Hiển thị 6 màu hex với animation stagger.
-///
-/// Tuân thủ:
-///   - ui-ux-design #2: 8pt grid spacing
-///   - ui-ux-design #3: bóng đổ mềm cho mỗi ô màu
-///   - Tính năng #19: Bảng màu cá nhân 6 hex
-///
-/// Sử dụng:
-///   ColorPaletteRow(
-///     hexColors: ['#8B4513', '#D2691E', '#A0522D', '#CD853F', '#DEB887', '#F4A460'],
-///   )
+// ColorPaletteRow — Hiển thị 6 màu hex với animation stagger.
+//
+//
+// Sử dụng:
+//   ColorPaletteRow(
+//     hexColors: ['#8B4513', '#D2691E', '#A0522D', '#CD853F', '#DEB887', '#F4A460'],
+//   )
 import 'package:flutter/material.dart';
 
 class ColorPaletteRow extends StatefulWidget {
@@ -32,7 +28,6 @@ class _ColorPaletteRowState extends State<ColorPaletteRow>
   void initState() {
     super.initState();
 
-    // Stagger animation: mỗi màu delay 100ms (SHOULD — result reveal)
     _controllers = List.generate(
       widget.hexColors.length,
       (i) => AnimationController(
@@ -71,21 +66,20 @@ class _ColorPaletteRowState extends State<ColorPaletteRow>
         return ScaleTransition(
           scale: _animations[index],
           child: Container(
-            width: 48,   // bội 8
-            height: 48,  // bội 8
+            width: 48, // bội 8
+            height: 48, // bội 8
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
-              // Bóng đổ mềm bằng chính màu đó (ui-ux-design #3)
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.4),
-                  blurRadius: 8,   // bội 8
+                  color: color.withValues(alpha: 0.4),
+                  blurRadius: 8, // bội 8
                   offset: const Offset(0, 4),
                 ),
               ],
               border: Border.all(
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 width: 2,
               ),
             ),

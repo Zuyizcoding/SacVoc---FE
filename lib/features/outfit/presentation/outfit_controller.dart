@@ -1,14 +1,12 @@
-﻿/// Outfit controller for the F3 recommendation flow.
-///
-/// Conventions:
-///   - mobile-flutter #4: AsyncNotifier with data/loading/error states
-///   - mobile-flutter #3: call the Repository, never Dio directly
-///   - Feature #15: handle MissingAnalysisException explicitly
+// Outfit controller for the F3 recommendation flow.
+//
+// Conventions:
+//   - Feature #15: handle MissingAnalysisException explicitly
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/network/dio_client.dart';
 import '../data/outfit_repository.dart';
 import '../domain/outfit_result.dart';
-import '../../../core/network/dio_client.dart';
-
 
 // Providers.
 
@@ -30,7 +28,6 @@ final outfitDetailProvider =
   final repo = ref.watch(outfitRepositoryProvider);
   return repo.getOutfitDetail(outfitId);
 });
-
 
 // Controller.
 
@@ -67,4 +64,3 @@ class OutfitController extends AsyncNotifier<OutfitResult?> {
     await loadRecommendations(occasion: occasion, gender: gender);
   }
 }
-

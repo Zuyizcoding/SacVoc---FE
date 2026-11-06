@@ -35,7 +35,7 @@ class AppColors {
   static const Color inputBackground = FigmaPalette.inputBackground;
   static const Color ring = FigmaPalette.ring;
 
-    static Color shadowTint([double opacity = 0.08]) =>
+  static Color shadowTint([double opacity = 0.08]) =>
       FigmaPalette.shadowColor.withValues(alpha: opacity);
 }
 
@@ -66,7 +66,8 @@ class AppRadii {
   static const double lg = 10; // radius
   static const double xl = 14; // radius + 4
 
-  // Backward-compatible aliases used across the Flutter UI.
+  // Alias tương thích mã cũ; số trong tên không phải kích thước pixel.
+  // Code hiện tại dùng sm/md/lg/xl để tránh hiểu nhầm.
   static const double r8 = md;
   static const double r16 = lg;
   static const double r24 = xl;

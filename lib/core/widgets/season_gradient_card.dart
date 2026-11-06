@@ -1,22 +1,17 @@
-/// SeasonGradientCard — Thẻ kết quả với gradient theo mùa sắc.
-///
-/// Tuân thủ:
-///   - ui-ux-design #1: Glassmorphism — BackdropFilter + gradient overlay
-///   - ui-ux-design #2: 8pt grid — padding 24, borderRadius 16, spacing 8/16
-///   - ui-ux-design #3: Colored shadow (opacity thấp) thay vì bóng đen cứng
-///   - ui-ux-design #4: Typography phân cấp rõ ràng
-///   - SHOULD S5: Season gradient background
-///
-/// Sử dụng:
-///   SeasonGradientCard(
-///     subSeason: 'Soft Autumn',
-///     primarySeason: 'Autumn',
-///     confidence: 0.87,
-///     explanation: 'Tone da của bạn có undertone ấm...',
-///     gradientFrom: Color(0xFFE9C46A),
-///     gradientTo: Color(0xFF8B4513),
-///   )
+// SeasonGradientCard — Thẻ kết quả với gradient theo mùa sắc.
+//
+//
+// Sử dụng:
+//   SeasonGradientCard(
+//     subSeason: 'Soft Autumn',
+//     primarySeason: 'Autumn',
+//     confidence: 0.87,
+//     explanation: 'Tone da của bạn có undertone ấm...',
+//     gradientFrom: Color(0xFFE9C46A),
+//     gradientTo: Color(0xFF8B4513),
+//   )
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../theme/figma_palette.dart';
@@ -42,15 +37,14 @@ class SeasonGradientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Colored shadow (ui-ux-design #3)
       // Bóng dùng màu gradient chính với opacity thấp — cảm giác nổi tự nhiên
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16), // bội 8
         boxShadow: [
           BoxShadow(
             color: gradientFrom.withValues(alpha: 0.30), // bóng màu, KHÔNG đen
-            blurRadius: 24,                         // bội 8
-            offset: const Offset(0, 8),             // bội 8
+            blurRadius: 24, // bội 8
+            offset: const Offset(0, 8), // bội 8
             spreadRadius: 0,
           ),
         ],
@@ -97,26 +91,28 @@ class SeasonGradientCard extends StatelessWidget {
                 children: [
                   // ─── Primary Season Badge ───
                   _buildSeasonBadge(),
-                  const SizedBox(height: 16),  // bội 8
+                  const SizedBox(height: 16), // bội 8
 
                   // ─── Sub-season Title (Heading — Bold) ───
                   Text(
                     subSeason,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontWeight: FontWeight.bold,  // ui-ux-design #4: Heading Bold
+                      fontWeight:
+                          FontWeight.bold, // ui-ux-design #4: Heading Bold
                       color: Colors.white,
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),  // bội 8
+                  const SizedBox(height: 8), // bội 8
 
                   // ─── Explanation (Body — Regular) ───
                   Text(
                     explanation,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,  // ui-ux-design #4: Body Regular
+                      fontWeight:
+                          FontWeight.w400, // ui-ux-design #4: Body Regular
                       color: Colors.white.withValues(alpha: 0.90),
                       height: 1.5,
                     ),
@@ -126,7 +122,6 @@ class SeasonGradientCard extends StatelessWidget {
               ),
             ),
 
-            // ─── Layer 2: Glassmorphism Overlay (ui-ux-design #1) ───
             Positioned(
               top: 0,
               right: 0,
@@ -138,8 +133,8 @@ class SeasonGradientCard extends StatelessWidget {
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,  // bội 8
-                      vertical: 8,     // bội 8
+                      horizontal: 16, // bội 8
+                      vertical: 8, // bội 8
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.15),

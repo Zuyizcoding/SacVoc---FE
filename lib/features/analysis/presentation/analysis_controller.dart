@@ -1,17 +1,14 @@
-/// Controller phân tích ảnh — quản lý state Loading/Success/Error.
-///
-/// Tuân thủ:
-///   - mobile-flutter #2: Riverpod — tách logic khỏi Widget
-///   - mobile-flutter #4: AsyncValue — 3 trạng thái UI
-///   - Widget chỉ hiển thị (Dumb Widget), logic đẩy về Controller
+// Controller phân tích ảnh — quản lý state Loading/Success/Error.
+//
+//   - Widget chỉ hiển thị (Dumb Widget), logic đẩy về Controller
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/analysis_repository.dart';
 import '../domain/analysis_history_result.dart';
-import '../domain/color_result.dart';
 import '../domain/body_result.dart';
+import '../domain/color_result.dart';
 
 // ──────────────────────────────────────────────
 // Color Analysis Controller (F1)
@@ -33,7 +30,7 @@ class ColorAnalysisController extends AsyncNotifier<ColorResult?> {
   /// Gửi ảnh selfie đi phân tích.
   ///
   /// UI gọi: ref.read(colorAnalysisProvider.notifier).analyzeImage(file)
-  /// UI listen: ref.watch(colorAnalysisProvider) → AsyncValue<ColorResult?>
+  // UI listen: ref.watch(colorAnalysisProvider) → AsyncValue<ColorResult?>
   ///   - AsyncLoading → hiển thị shimmer/spinner
   ///   - AsyncData    → hiển thị ColorResultScreen
   ///   - AsyncError   → hiển thị ErrorView với message tiếng Việt
@@ -41,7 +38,6 @@ class ColorAnalysisController extends AsyncNotifier<ColorResult?> {
     // Đặt state = loading → UI tự hiển thị loading
     state = const AsyncValue.loading();
 
-    // Gọi Repository (mobile-flutter #3: UI không gọi HTTP trực tiếp)
     final nextState = await AsyncValue.guard(() async {
       final repository = ref.read(analysisRepositoryProvider);
       return repository.analyzeColor(imageFile);

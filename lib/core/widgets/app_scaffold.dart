@@ -28,8 +28,9 @@ class AppScaffold extends StatelessWidget {
 
     final scaffold = Scaffold(
       appBar: appBar,
-      backgroundColor:
-          FigmaPalette.backgroundGradient == null ? AppColors.background : Colors.transparent,
+      backgroundColor: FigmaPalette.backgroundGradient == null
+          ? AppColors.background
+          : Colors.transparent,
       body: scroll ? SingleChildScrollView(child: body) : body,
     );
 

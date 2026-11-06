@@ -1,6 +1,5 @@
 /// Model kết quả phân tích dáng người — Immutable.
 ///
-/// Tuân thủ: mobile-flutter #1 — domain/ chứa Entity classes.
 /// Map 1:1 với BodyApiResponse trên backend.
 class BodyMeasurements {
   final String shoulderRelative;

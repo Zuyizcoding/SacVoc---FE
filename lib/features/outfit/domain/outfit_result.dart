@@ -1,7 +1,4 @@
-/// Outfit Result — Immutable model cho F3.
-///
-/// Tuân thủ: mobile-flutter #3 — Domain model tách biệt API response.
-/// Mapping từ OutfitRecommendResponse (API) → OutfitResult (Domain).
+// Model kết quả F3, chuyển JSON API thành dữ liệu có kiểu rõ.
 
 class OutfitItem {
   final int id;
@@ -42,7 +39,6 @@ class OutfitItem {
   }
 }
 
-
 class OutfitResult {
   /// Text query đã dùng để search — hiển thị debug / "Tìm kiếm theo..."
   final String queryUsed;
@@ -68,7 +64,6 @@ class OutfitResult {
     );
   }
 }
-
 
 class OutfitDetail {
   final int id;

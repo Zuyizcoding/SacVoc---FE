@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/theme/app_tokens.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_scaffold.dart';
-import '../../../../core/widgets/app_states.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/app_states.dart';
 import 'outfit_controller.dart';
 
 class OutfitDetailScreen extends ConsumerWidget {
@@ -43,7 +43,7 @@ class OutfitDetailScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadii.r16),
+              borderRadius: BorderRadius.circular(AppRadii.lg),
               child: CachedNetworkImage(
                 imageUrl: detail.imageUrl,
                 height: 280,
@@ -84,8 +84,9 @@ class OutfitDetailScreen extends ConsumerWidget {
               ),
             const SizedBox(height: AppSpacing.s16),
             FilledButton.icon(
-              onPressed:
-                  detail.shopeeUrl.isEmpty ? null : () => _launchUrl(detail.shopeeUrl),
+              onPressed: detail.shopeeUrl.isEmpty
+                  ? null
+                  : () => _launchUrl(detail.shopeeUrl),
               icon: const Icon(Icons.shopping_bag_outlined),
               label: const Text('Mua trên Shopee'),
             ),

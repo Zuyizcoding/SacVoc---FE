@@ -1,22 +1,19 @@
-﻿// Repository phân tích ảnh — giao tiếp với Backend API.
-//
-// Tuân thủ:
-//   - mobile-flutter #3: Abstract class → dễ Mock test
-//   - mobile-flutter #3: UI KHÔNG gọi HTTP trực tiếp — luôn qua Repository
-//   - Tính năng #3: Device ID đã inject qua Dio interceptor (dio_client.dart)
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/api_constants.dart';
+import '../../../core/network/api_error_details.dart';
 import '../../../core/network/dio_client.dart';
 import '../domain/analysis_history_result.dart';
-import '../domain/color_result.dart';
 import '../domain/body_result.dart';
+import '../domain/color_result.dart';
+
+// Repository phân tích ảnh — giao tiếp với Backend API.
+//
 
 // ──────────────────────────────────────────────
-// Abstract Repository (mobile-flutter #3)
 // ──────────────────────────────────────────────
 abstract class AnalysisRepository {
   /// F1 — Phân tích màu sắc từ ảnh selfie
@@ -36,77 +33,6 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
   final Dio _dio;
 
   AnalysisRepositoryImpl(this._dio);
-
-  String? _asCleanString(Object? value) {
-    if (value is String && value.trim().isNotEmpty) {
-      return value.trim();
-    }
-    return null;
-  }
-
-  String? _bodyErrorMessage(Map<String, dynamic> json) {
-    final error = _asCleanString(json['error']);
-    if (error != null) {
-      return error;
-    }
-
-    final detail = json['detail'];
-    if (detail is Map<String, dynamic>) {
-      return _asCleanString(detail['message']) ?? _asCleanString(detail['error']);
-    }
-    return _asCleanString(detail);
-  }
-
-  String? _bodyErrorCode(Map<String, dynamic> json) {
-    final direct = json['error_code'];
-    if (direct != null) {
-      return direct.toString().trim();
-    }
-
-    final detail = json['detail'];
-    if (detail is Map<String, dynamic> && detail['error_code'] != null) {
-      return detail['error_code'].toString().trim();
-    }
-    return null;
-  }
-
-  String? _responseDetail(DioException e) {
-    final data = e.response?.data;
-    if (data is Map<String, dynamic>) {
-      final detail = data['detail'];
-      if (detail is Map<String, dynamic>) {
-        final message = _asCleanString(detail['message']) ?? _asCleanString(detail['error']);
-        if (message != null) {
-          return message;
-        }
-      }
-      final detailString = _asCleanString(detail);
-      if (detailString != null) {
-        return detailString;
-      }
-      final bodyError = _asCleanString(data['error']);
-      if (bodyError != null) {
-        return bodyError;
-      }
-    }
-    return null;
-  }
-
-  String? _responseErrorCode(DioException e) {
-    final data = e.response?.data;
-    if (data is Map<String, dynamic>) {
-      final direct = data['error_code'];
-      if (direct != null) {
-        return direct.toString().trim();
-      }
-
-      final detail = data['detail'];
-      if (detail is Map<String, dynamic> && detail['error_code'] != null) {
-        return detail['error_code'].toString().trim();
-      }
-    }
-    return null;
-  }
 
   Exception _exceptionFromTypedError({
     String? errorCode,
@@ -144,9 +70,11 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
                   'Bạn có thể thử ảnh khác rõ hơn.',
         );
       case 429:
-        return Exception(message ?? 'Hệ thống AI đang quá tải. Vui lòng thử lại sau.');
+        return Exception(
+            message ?? 'Hệ thống AI đang quá tải. Vui lòng thử lại sau.');
       case 503:
-        return Exception(message ?? 'AI đang phản hồi chậm hoặc quá tải. Vui lòng thử lại sau.');
+        return Exception(message ??
+            'AI đang phản hồi chậm hoặc quá tải. Vui lòng thử lại sau.');
       default:
         return Exception(message ?? 'Đã có lỗi xảy ra. Vui lòng thử lại.');
     }
@@ -157,15 +85,16 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
     String fallbackMessage = 'Phân tích thất bại',
   }) {
     return _exceptionFromTypedError(
-      errorCode: _bodyErrorCode(json),
-      message: _bodyErrorMessage(json) ?? fallbackMessage,
+      errorCode: ApiErrorDetails.fromBody(json).code,
+      message: ApiErrorDetails.fromBody(json).message ?? fallbackMessage,
       statusCode: null,
     );
   }
 
   Exception _mapDioError(DioException e) {
-    final detail = _responseDetail(e);
-    final errorCode = _responseErrorCode(e);
+    final details = ApiErrorDetails.fromException(e);
+    final detail = details.message;
+    final errorCode = details.code;
 
     if (e.type == DioExceptionType.receiveTimeout) {
       return Exception(
@@ -265,11 +194,8 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
 }
 
 // ──────────────────────────────────────────────
-// Riverpod Provider (mobile-flutter #2)
 // ──────────────────────────────────────────────
 final analysisRepositoryProvider = Provider<AnalysisRepository>((ref) {
   final dio = ref.watch(dioProvider);
   return AnalysisRepositoryImpl(dio);
 });
-
-

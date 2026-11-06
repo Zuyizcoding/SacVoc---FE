@@ -1,16 +1,14 @@
-/// GlassmorphicCard — Container với hiệu ứng kính mờ.
-///
-/// Tuân thủ:
-///   - ui-ux-design #1: Glassmorphism — BackdropFilter blur
-///   - ui-ux-design #2: 8pt grid — padding/borderRadius bội 8
-///   - ui-ux-design #3: Bóng đổ mềm
-///
-/// Sử dụng:
-///   GlassmorphicCard(
-///     child: Text('Nội dung bên trong'),
-///   )
+// GlassmorphicCard — Container với hiệu ứng kính mờ.
+//
+//
+// Sử dụng:
+//   GlassmorphicCard(
+//     child: Text('Nội dung bên trong'),
+//   )
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
 class GlassmorphicCard extends StatelessWidget {
@@ -38,7 +36,7 @@ class GlassmorphicCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: AppTheme.cardShadow,  // Bóng đổ mềm
+        boxShadow: AppTheme.cardShadow, // Bóng đổ mềm
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
@@ -47,10 +45,10 @@ class GlassmorphicCard extends StatelessWidget {
           child: Container(
             padding: padding ?? const EdgeInsets.all(AppTheme.spacing24),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(opacity),
+              color: Colors.white.withValues(alpha: opacity),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),

@@ -1,13 +1,13 @@
-﻿import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/widgets/app_scaffold.dart';
 import '../data/outfit_repository.dart';
 import '../domain/outfit_result.dart';
 import 'outfit_controller.dart';
-import 'widgets/outfit_grid.dart';
+import 'widgets/outfit_list.dart';
 
 class OutfitScreen extends ConsumerStatefulWidget {
   const OutfitScreen({super.key});
@@ -92,8 +92,7 @@ class _OutfitScreenState extends ConsumerState<OutfitScreen> {
     return AppScaffold(
       appBar: AppBar(title: const Text('Gợi ý trang phục')),
       padding: EdgeInsets.zero,
-      child: const OutfitGrid(),
+      child: const OutfitList(),
     );
   }
 }
-
